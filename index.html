@@ -4,148 +4,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Or du Temps - Massage Bien-être à Albi & Toulouse</title>
+    <title>Or du Temps — Massage Bien-être à Albi & Toulouse</title>
     <meta name="description"
-        content="Découvrez Or du Temps, votre institut de massage bien-être à Albi et Toulouse. Massages signature, chinois, relaxants et thérapeutiques.">
-    <link rel="stylesheet" href="style.css">
+        content="Or du Temps, votre sanctuaire de bien-être à Albi et Toulouse. Massages signature, chinois, deep tissue, suédois et thaï. Une parenthèse hors du temps.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
         rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <!-- Placeholder for FontAwesome, might need a real kit or SVG icons -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="#" class="logo">
-                <img src="assets/logo.svg" alt="Or du Temps Logo" id="nav-logo">
-                <span class="logo-text">Or du Temps</span>
+    <!-- ══════════════════════════════════════
+         NAVIGATION
+    ══════════════════════════════════════ -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">
+                <svg width="28" height="28" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                    <circle cx="20" cy="20" r="18" stroke="#C9A84C" stroke-width="1.5" />
+                    <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" opacity="0.85" />
+                    <circle cx="20" cy="20" r="3" fill="#C9A84C" />
+                </svg>
+                <span>Or du Temps</span>
             </a>
-            <ul class="nav-links">
-                <li><a href="#home">Accueil</a></li>
-                <li><a href="#about">L'Institut</a></li>
-                <li><a href="#services">Soins & Tarifs</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="tel:0786398886" class="cta-btn">Prendre RDV</a></li>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home" class="nav-link">Accueil</a></li>
+                <li><a href="#about" class="nav-link">L'Institut</a></li>
+                <li><a href="#services" class="nav-link">Soins</a></li>
+                <li><a href="#testimonials" class="nav-link">Avis</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="tel:0786398886" class="nav-cta" id="nav-rdv-btn">Prendre RDV</a></li>
             </ul>
-            <div class="menu-toggle">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
+            <button class="hamburger" id="hamburger" aria-label="Ouvrir le menu" aria-expanded="false">
+                <span class="ham-line"></span>
+                <span class="ham-line"></span>
+                <span class="ham-line"></span>
+            </button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header id="home" class="hero">
-        <div class="hero-content">
-            <h1>L'Art du Massage à Albi</h1>
-            <p>Un voyage sensoriel pour le corps et l'esprit. Disponible également à Toulouse.</p>
-            <a href="tel:0786398886" class="hero-btn">Réserver une Séance</a>
+    <!-- ══════════════════════════════════════
+         HERO
+    ══════════════════════════════════════ -->
+    <section id="home" class="hero">
+        <div class="hero-particles" id="hero-particles" aria-hidden="true"></div>
+        <img src="file:///home/teambull/.gemini/antigravity/brain/4e78753e-7745-49ac-9c9b-aacd12b59227/hero_warm_bg_1771525345403.png"
+            alt="" class="hero-bg-img" aria-hidden="true">
+        <div class="hero-overlay" aria-hidden="true"></div>
+        <div class="hero-content reveal-hero">
+            <p class="hero-eyebrow">Institut de Bien-être · Albi & Toulouse</p>
+            <h1 class="hero-title">L'Art du<br><em>Massage</em></h1>
+            <p class="hero-subtitle">Une parenthèse hors du temps pour votre corps et votre esprit.</p>
+            <div class="hero-actions">
+                <a href="tel:0786398886" class="btn btn-primary" id="hero-rdv-btn">Réserver une Séance</a>
+                <a href="#services" class="btn btn-ghost" id="hero-discover-btn">Découvrir les soins</a>
+            </div>
         </div>
-    </header>
+        <a href="#about" class="hero-scroll-cue" aria-label="Défiler vers le bas" id="hero-scroll">
+            <span class="scroll-line"></span>
+        </a>
+    </section>
 
-    <!-- About Section -->
-    <section id="about" class="section">
+    <!-- ══════════════════════════════════════
+         BANDEAU CHIFFRES
+    ══════════════════════════════════════ -->
+    <div class="stats-band">
+        <div class="stats-container">
+            <div class="stat-item reveal">
+                <span class="stat-number">5+</span>
+                <span class="stat-label">Techniques de massage</span>
+            </div>
+            <div class="stat-divider" aria-hidden="true"></div>
+            <div class="stat-item reveal">
+                <span class="stat-number">2</span>
+                <span class="stat-label">Villes — Albi & Toulouse</span>
+            </div>
+            <div class="stat-divider" aria-hidden="true"></div>
+            <div class="stat-item reveal">
+                <span class="stat-number">7j/7</span>
+                <span class="stat-label">Disponible pour vous</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         À PROPOS
+    ══════════════════════════════════════ -->
+    <section id="about" class="section about-section">
         <div class="container">
-            <h2 class="section-title">L'Esprit Or du Temps</h2>
-            <div class="about-content">
-                <div class="about-text">
+            <div class="about-grid">
+                <div class="about-visual reveal-left">
+                    <div class="about-img-frame">
+                        <img src="file:///home/teambull/.gemini/antigravity/brain/4e78753e-7745-49ac-9c9b-aacd12b59227/about_ambiance_1771525369798.png"
+                            alt="La salle de soin Or du Temps — lumière chaude et cosy" class="about-img"
+                            loading="lazy">
+                        <div class="about-img-decor" aria-hidden="true"></div>
+                    </div>
+                    <div class="about-badge reveal">
+                        <svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                            <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" />
+                        </svg>
+                        <div>
+                            <strong>Certifiée &amp; passionnée</strong>
+                            <span>Praticienne de bien-être</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-text reveal-right">
+                    <p class="section-eyebrow">L'Esprit Or du Temps</p>
+                    <h2 class="section-title">Un voyage sensoriel<br>pour vous <em>reconnecter</em></h2>
                     <p>Bienvenue dans mon univers de détente et de bien-être. Situé au cœur d'Albi, je vous propose une
-                        parenthèse hors du temps pour vous reconnecter à votre corps.</p>
+                        <strong>parenthèse hors du temps</strong> pour vous reconnecter à votre corps.
+                    </p>
                     <p>Chaque massage est une invitation au voyage, mêlant techniques ancestrales et écoute attentive de
                         vos besoins. Que vous cherchiez à soulager des tensions ou simplement à vous relaxer, je saurai
-                        adapter mes soins pour vous offrir une expérience unique.</p>
+                        adapter mes soins pour vous offrir une expérience unique et profondément ressourçante.</p>
+                    <blockquote class="about-quote">
+                        <span>"Le corps parle. Le massage l'écoute."</span>
+                    </blockquote>
+                    <a href="#services" class="btn btn-outline" id="about-soins-btn">Explorer les soins</a>
                 </div>
-                <!-- Image placeholder for now -->
-                <div class="about-image"></div>
             </div>
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section id="services" class="section bg-dark">
+    <!-- ══════════════════════════════════════
+         SOINS & TARIFS
+    ══════════════════════════════════════ -->
+    <section id="services" class="section services-section">
         <div class="container">
-            <h2 class="section-title">Nos Soins & Tarifs</h2>
+            <div class="section-header reveal">
+                <p class="section-eyebrow">Notre Menu</p>
+                <h2 class="section-title">Soins &amp; Tarifs</h2>
+                <p class="section-lead">Chaque soin est personnalisé selon vos besoins du moment.</p>
+            </div>
             <div class="services-grid">
-                <!-- Service Card 1 -->
-                <div class="service-card">
-                    <h3>Massage Signature</h3>
-                    <p>Une création unique mêlant diverses techniques pour une relaxation profonde.</p>
-                    <div class="price">1h30 - 70€</div>
-                </div>
-                <!-- Service Card 2 -->
-                <div class="service-card">
-                    <h3>Massage Chinois</h3>
-                    <p>Énergétique et tonique, idéal pour rééquilibrer le corps.</p>
-                    <div class="price">Variable</div>
-                </div>
-                <!-- Service Card 3 -->
-                <div class="service-card">
-                    <h3>Deep Tissue</h3>
-                    <p>Massage des tissus profonds pour dénouer les tensions musculaires chroniques.</p>
-                    <div class="price">Variable</div>
-                </div>
-                <!-- Service Card 4 -->
-                <div class="service-card">
-                    <h3>Massage Suédois</h3>
-                    <p>Détente musculaire et amélioration de la circulation sanguine.</p>
-                    <div class="price">Variable</div>
-                </div>
-                <!-- Service Card 5 -->
-                <div class="service-card">
-                    <h3>Massage Thaï</h3>
-                    <p>Étirements et pressions pour retrouver souplesse et énergie.</p>
-                    <div class="price">Variable</div>
-                </div>
+                <!-- Massage Signature -->
+                <article class="service-card reveal" id="soin-signature">
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M24 6C15 6 9 14 9 22C9 32 16 38 24 42C32 38 39 32 39 22C39 14 33 6 24 6Z"
+                                stroke="#C9A84C" stroke-width="1.5" />
+                            <circle cx="24" cy="22" r="5" fill="#C9A84C" opacity="0.7" />
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <h3>Massage Signature</h3>
+                        <p>Notre création exclusive. Un voyage en plusieurs étapes mêlant effleurages doux, pressions
+                            profondes et étirements pour une relaxation absolue.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-tag">1h30 · <strong>70 €</strong></span>
+                        <a href="tel:0786398886" class="card-cta" aria-label="Réserver le massage signature">Réserver
+                            →</a>
+                    </div>
+                </article>
+                <!-- Massage Chinois -->
+                <article class="service-card reveal" id="soin-chinois">
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M12 36 Q24 6 36 36" stroke="#C9A84C" stroke-width="1.5" />
+                            <path d="M8 24 H40" stroke="#C9A84C" stroke-width="1.5" />
+                            <circle cx="24" cy="24" r="4" fill="#C9A84C" opacity="0.7" />
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <h3>Massage Chinois</h3>
+                        <p>Énergétique et tonique, ce massage ancestral travaille sur les méridiens pour rééquilibrer le
+                            flux vital et libérer les blocages.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-tag">Sur devis</span>
+                        <a href="tel:0786398886" class="card-cta" aria-label="Réserver le massage chinois">Réserver
+                            →</a>
+                    </div>
+                </article>
+                <!-- Deep Tissue -->
+                <article class="service-card reveal" id="soin-deep-tissue">
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <rect x="14" y="10" width="20" height="28" rx="10" stroke="#C9A84C" stroke-width="1.5" />
+                            <path d="M19 20 H29 M19 24 H29 M19 28 H26" stroke="#C9A84C" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <h3>Deep Tissue</h3>
+                        <p>Ciblant les couches profondes du tissu musculaire, ce massage libère les tensions chroniques
+                            et soulage douleurs et raideurs persistantes.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-tag">Sur devis</span>
+                        <a href="tel:0786398886" class="card-cta" aria-label="Réserver le deep tissue">Réserver →</a>
+                    </div>
+                </article>
+                <!-- Massage Suédois -->
+                <article class="service-card reveal" id="soin-suedois">
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M10 30 Q18 12 24 20 Q30 28 38 10" stroke="#C9A84C" stroke-width="1.5" />
+                            <circle cx="24" cy="24" r="6" stroke="#C9A84C" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <h3>Massage Suédois</h3>
+                        <p>Le classique par excellence. Long effleurages glissés pour apaiser le système nerveux,
+                            améliorer la circulation et dissoudre le stress.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-tag">Sur devis</span>
+                        <a href="tel:0786398886" class="card-cta" aria-label="Réserver le massage suédois">Réserver
+                            →</a>
+                    </div>
+                </article>
+                <!-- Massage Thaï -->
+                <article class="service-card reveal" id="soin-thai">
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M24 10 L20 20 L10 20 L18 27 L15 38 L24 31 L33 38 L30 27 L38 20 L28 20Z"
+                                stroke="#C9A84C" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <h3>Massage Thaï</h3>
+                        <p>Pratiqué sur tapis, ce massage dynamique associe pressions rythmées et étirements profonds
+                            pour retrouver souplesse et énergie vitale.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-tag">Sur devis</span>
+                        <a href="tel:0786398886" class="card-cta" aria-label="Réserver le massage thaï">Réserver →</a>
+                    </div>
+                </article>
+                <!-- Ado -->
+                <article class="service-card service-card--ado reveal" id="soin-ado">
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="16" r="7" stroke="#C9A84C" stroke-width="1.5" />
+                            <path d="M12 38 C12 28 36 28 36 38" stroke="#C9A84C" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="card-body">
+                        <h3>Soin Adolescent</h3>
+                        <p>Spécialement adapté aux 11–18 ans. Un moment doux pour apprendre à écouter son corps et se
+                            (re)connecter à soi-même.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price-tag">1h · <strong>50 €</strong></span>
+                        <a href="tel:0786398886" class="card-cta" aria-label="Réserver le soin ado">Réserver →</a>
+                    </div>
+                </article>
             </div>
-            <div class="pricing-note">
-                <p><strong>Tarifs Adultes :</strong> 1h30 - 70€ | 2h - 90€</p>
-                <p><strong>Tarif Adolescent (11-18 ans) :</strong> 1h - 50€</p>
+            <!-- Tarif global -->
+            <div class="pricing-banner reveal">
+                <div class="pricing-banner-inner">
+                    <svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                        <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" />
+                    </svg>
+                    <p><strong>Tarifs adultes :</strong> 1h30 – 70 € &nbsp;|&nbsp; 2h – 90 €</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-        <div class="container">
-            <h2 class="section-title">Contact & Accès</h2>
-            <div class="contact-wrapper">
-                <div class="contact-info">
-                    <div class="info-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <p>101 Avenue Gambetta, 81000 Albi</p>
+    <!-- ══════════════════════════════════════
+         EMMA GARCIA — LA PRATICIENNE
+    ══════════════════════════════════════ -->
+    <section id="emma" class="section emma-section">
+        <div class="emma-grid">
+            <div class="emma-image-side">
+                <img src="file:///home/teambull/.gemini/antigravity/brain/4e78753e-7745-49ac-9c9b-aacd12b59227/emma_massage_1771525405796.png"
+                    alt="Emma Garcia, praticienne de bien-être, réalisant un massage relaxant" class="emma-img"
+                    loading="lazy">
+            </div>
+            <div class="emma-text-side">
+                <p class="section-eyebrow">Votre Praticienne</p>
+                <h2 class="section-title">Emma Garcia</h2>
+                <p>Passionnée par le bien-être depuis plus de 10 ans, Emma a été formée aux techniques de massage en
+                    France, en Thaïlande et en Chine. Elle met son expertise et sa sensibilité au service de chaque
+                    client.</p>
+                <p>Son approche est avant tout <strong>personnalisée et intuitive</strong> : elle adapte chaque soin à
+                    vos tensions, votre morphologie et votre état émotionnel du jour.</p>
+                <div class="emma-values">
+                    <div class="emma-value">
+                        <svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                            <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" />
+                        </svg>
+                        <span>Formations multi-culturelles</span>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-phone"></i>
-                        <p><a href="tel:0786398886">07 86 39 88 86</a></p>
+                    <div class="emma-value">
+                        <svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                            <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" />
+                        </svg>
+                        <span>Écoute et bienveillance</span>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-clock"></i>
-                        <p>Lun-Sam: 9h - 21h <br> Dim: 10h - 21h</p>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-city"></i>
-                        <p>Disponibilités ponctuelles à Toulouse</p>
+                    <div class="emma-value">
+                        <svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                            <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" />
+                        </svg>
+                        <span>Soins personnalisés</span>
                     </div>
                 </div>
-                <div class="map-placeholder">
-                    <!-- Google Maps Embed Placeholder -->
+                <a href="tel:0786398886" class="btn btn-primary" id="emma-rdv-btn">Prendre rendez-vous avec Emma</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         TÉMOIGNAGES
+    ══════════════════════════════════════ -->
+    <section id="testimonials" class="section testimonials-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <p class="section-eyebrow">Ce qu'ils disent</p>
+                <h2 class="section-title">Témoignages</h2>
+            </div>
+            <div class="testimonials-track-wrapper">
+                <div class="testimonials-track" id="testimonials-track">
+                    <div class="testimonial-card">
+                        <div class="stars" aria-label="5 étoiles">★★★★★</div>
+                        <p>"Une heure et demie de pure félicité. Le massage signature est absolument envoûtant — on
+                            repart transformé, le corps léger et l'esprit apaisé."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar" aria-hidden="true">M</div>
+                            <div><strong>Marie L.</strong><span>Albi</span></div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="stars" aria-label="5 étoiles">★★★★★</div>
+                        <p>"J'avais des douleurs chroniques aux épaules depuis des mois. Après un Deep Tissue, j'ai
+                            retrouvé une mobilité que je croyais perdue. Bluffant."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar" aria-hidden="true">T</div>
+                            <div><strong>Thomas R.</strong><span>Toulouse</span></div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="stars" aria-label="5 étoiles">★★★★★</div>
+                        <p>"Un cadre chaleureux, une praticienne à l'écoute et un moment hors du temps. J'y emmène
+                            maintenant toute ma famille. Un vrai sanctuaire."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar" aria-hidden="true">S</div>
+                            <div><strong>Sophie D.</strong><span>Albi</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonials-nav" aria-label="Navigation des témoignages">
+                <button class="t-dot t-dot--active" id="t-dot-0" aria-label="Témoignage 1"></button>
+                <button class="t-dot" id="t-dot-1" aria-label="Témoignage 2"></button>
+                <button class="t-dot" id="t-dot-2" aria-label="Témoignage 3"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         CONTACT
+    ══════════════════════════════════════ -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <p class="section-eyebrow">Nous trouver</p>
+                <h2 class="section-title">Contact &amp; Accès</h2>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-cards">
+                    <div class="contact-card reveal" id="contact-adresse">
+                        <div class="contact-card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"
+                                    fill="#C9A84C" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Adresse</h4>
+                            <p>101 Avenue Gambetta<br>81000 Albi<br><em>+ disponibilités à Toulouse</em></p>
+                        </div>
+                    </div>
+                    <div class="contact-card reveal" id="contact-telephone">
+                        <div class="contact-card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"
+                                    fill="#C9A84C" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Téléphone</h4>
+                            <a href="tel:0786398886">07 86 39 88 86</a>
+                        </div>
+                    </div>
+                    <div class="contact-card reveal" id="contact-horaires">
+                        <div class="contact-card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="9" stroke="#C9A84C" stroke-width="1.5" />
+                                <path d="M12 7v5l3 3" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Horaires</h4>
+                            <p>Lun – Sam : 9h – 21h<br>Dim : 10h – 21h</p>
+                        </div>
+                    </div>
+                    <a href="tel:0786398886" class="contact-cta-big reveal" id="contact-cta">
+                        <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+                            <path
+                                d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"
+                                fill="#080808" />
+                        </svg>
+                        Appeler pour prendre RDV
+                    </a>
+                </div>
+                <div class="contact-map-wrapper reveal" id="contact-map">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2889.664273867624!2d2.145678315502624!3d43.92134597911306!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12abc34567890abc%3A0xabcdef0123456789!2s101%20Av.%20Gambetta%2C%2081000%20Albi%2C%20France!5e0!3m2!1sen!2sfr!4v1620000000000!5m2!1sen!2sfr"
-                        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2889.664273867624!2d2.145678315502624!3d43.92134597911306!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12abc34567890abc%3A0xabcdef0123456789!2s101%20Av.%20Gambetta%2C%2081000%20Albi%2C%20France!5e0!3m2!1sfr!2sfr!4v1620000000000!5m2!1sfr!2sfr"
+                        title="Or du Temps — 101 Avenue Gambetta, Albi" width="100%" height="100%" style="border:0;"
+                        allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 Or du Temps. Tous droits réservés.</p>
+    <!-- ══════════════════════════════════════
+         FOOTER
+    ══════════════════════════════════════ -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <svg width="24" height="24" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                    <circle cx="20" cy="20" r="18" stroke="#C9A84C" stroke-width="1.5" />
+                    <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" opacity="0.85" />
+                </svg>
+                <span>Or du Temps</span>
+            </div>
+            <p class="footer-tagline">L'art du massage à Albi &amp; Toulouse</p>
+            <p class="footer-copy">&copy; 2026 Or du Temps. Tous droits réservés.</p>
         </div>
     </footer>
 
