@@ -127,7 +127,7 @@ svg {
     font-size: .9rem;
     font-weight: 500;
     letter-spacing: .06em;
-    border-radius: 2px;
+    border-radius: 30px;
     transition: all .35s var(--ease-out);
     cursor: pointer;
     border: none;
@@ -253,7 +253,7 @@ svg {
     font-size: .82rem;
     font-weight: 500;
     letter-spacing: .1em;
-    border-radius: 2px;
+    border-radius: 30px;
     transition: all .3s;
 }
 
@@ -315,7 +315,7 @@ svg {
     height: 110%;
     object-fit: cover;
     object-position: center;
-    filter: brightness(.38) saturate(.85);
+    filter: brightness(.5) saturate(1.1);
     will-change: transform;
     z-index: 0;
 }
@@ -332,25 +332,14 @@ svg {
     z-index: 1;
 }
 
-/* Decorative grid */
-.hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(212, 168, 67, .03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(212, 168, 67, .03) 1px, transparent 1px);
-    background-size: 80px 80px;
-    pointer-events: none;
-    z-index: 1;
-}
+
 
 .hero-overlay {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse 70% 50% at 50% 80%, rgba(212, 168, 67, .18) 0%, transparent 65%),
-        linear-gradient(to top, rgba(10, 8, 6, .6) 0%, transparent 50%);
+        radial-gradient(ellipse 70% 50% at 50% 80%, rgba(225, 150, 70, .25) 0%, transparent 65%),
+        linear-gradient(to top, rgba(10, 8, 6, .4) 0%, transparent 60%);
     z-index: 2;
     pointer-events: none;
 }
