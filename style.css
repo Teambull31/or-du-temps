@@ -995,6 +995,149 @@ svg {
 }
 
 /* ══════════════════════════════════════════
+   FORMULAIRE DE CONTACT
+══════════════════════════════════════════ */
+.contact-form {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 3rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    font-size: .78rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.form-group input,
+.form-group textarea {
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    padding: .85rem 1rem;
+    font-family: var(--font-body);
+    font-size: .92rem;
+    color: var(--ivory);
+    outline: none;
+    transition: border-color .3s, box-shadow .3s, background .3s;
+    resize: vertical;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(200, 191, 176, .35);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--gold);
+    background: rgba(212, 168, 67, .05);
+    box-shadow: 0 0 0 3px rgba(212, 168, 67, .1);
+}
+
+.form-group input.error,
+.form-group textarea.error {
+    border-color: #e05a5a;
+}
+
+.form-submit {
+    width: 100%;
+    justify-content: center;
+    margin-top: .5rem;
+}
+
+.form-submit:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.form-feedback {
+    margin-top: 1rem;
+    font-size: .88rem;
+    text-align: center;
+    min-height: 1.4em;
+}
+
+.form-feedback.success {
+    color: #7ec87e;
+}
+
+.form-feedback.error {
+    color: #e07878;
+}
+
+/* Bouton Calendly dans le contact */
+.contact-cta-calendly {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    padding: 1.1rem;
+    background: transparent;
+    color: var(--gold);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: .92rem;
+    letter-spacing: .07em;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background .3s, color .3s, transform .3s, box-shadow .3s;
+    width: 100%;
+}
+
+.contact-cta-calendly:hover {
+    background: var(--gold);
+    color: var(--noir);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(201, 168, 76, .25);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ══════════════════════════════════════════
+   FOOTER LINKS
+══════════════════════════════════════════ */
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-size: .75rem;
+    color: rgba(200, 191, 176, .5);
+}
+
+.footer-links a {
+    color: rgba(200, 191, 176, .5);
+    transition: color .3s;
+}
+
+.footer-links a:hover {
+    color: var(--gold);
+}
+
+/* ══════════════════════════════════════════
    FOOTER
 ══════════════════════════════════════════ */
 .footer {

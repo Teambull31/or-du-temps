@@ -7,11 +7,27 @@
     <title>Or du Temps — Massage Bien-être à Albi & Toulouse</title>
     <meta name="description"
         content="Or du Temps, votre sanctuaire de bien-être à Albi et Toulouse. Massages signature, chinois, deep tissue, suédois et thaï. Une parenthèse hors du temps.">
+    <link rel="canonical" href="https://ordutemps.fr/">
+
+    <!-- Open Graph / Réseaux sociaux -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ordutemps.fr/">
+    <meta property="og:title" content="Or du Temps — Massage Bien-être à Albi & Toulouse">
+    <meta property="og:description" content="Massages signature, chinois, deep tissue, suédois et thaï. Une parenthèse hors du temps à Albi & Toulouse avec Emma Garcia, praticienne certifiée.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=1200">
+    <meta property="og:locale" content="fr_FR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Or du Temps — Massage Bien-être à Albi & Toulouse">
+    <meta name="twitter:description" content="Une parenthèse hors du temps. Massages sur mesure à Albi & Toulouse avec Emma Garcia.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=1200">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
         rel="stylesheet">
+    <!-- Calendly -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -59,7 +75,7 @@
             <h1 class="hero-title">L'Art du<br><em>Massage</em></h1>
             <p class="hero-subtitle">Une parenthèse hors du temps pour votre corps et votre esprit.</p>
             <div class="hero-actions">
-                <a href="tel:0786398886" class="btn btn-primary" id="hero-rdv-btn">Réserver une Séance</a>
+                <button class="btn btn-primary" id="hero-rdv-btn" onclick="Calendly.initPopupWidget({url:'CALENDLY_URL'});return false;">Réserver en ligne</button>
                 <a href="#services" class="btn btn-ghost" id="hero-discover-btn">Découvrir les soins</a>
             </div>
         </div>
@@ -368,6 +384,30 @@
                 <p class="section-eyebrow">Nous trouver</p>
                 <h2 class="section-title">Contact &amp; Accès</h2>
             </div>
+            <!-- Formulaire de contact -->
+            <form class="contact-form reveal" id="contact-form" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contact-name">Nom *</label>
+                        <input type="text" id="contact-name" name="name" placeholder="Votre nom" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-email">Email *</label>
+                        <input type="email" id="contact-email" name="email" placeholder="votre@email.fr" required autocomplete="email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="contact-phone">Téléphone</label>
+                    <input type="tel" id="contact-phone" name="phone" placeholder="07 00 00 00 00" autocomplete="tel">
+                </div>
+                <div class="form-group">
+                    <label for="contact-message">Message *</label>
+                    <textarea id="contact-message" name="message" rows="5" placeholder="Votre message, le type de soin souhaité..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary form-submit" id="form-submit-btn">Envoyer le message</button>
+                <p class="form-feedback" id="form-feedback" aria-live="polite"></p>
+            </form>
+
             <div class="contact-grid">
                 <div class="contact-cards">
                     <div class="contact-card reveal" id="contact-adresse">
@@ -416,6 +456,13 @@
                         </svg>
                         Appeler pour prendre RDV
                     </a>
+                    <button class="contact-cta-calendly reveal" id="contact-calendly-btn" onclick="Calendly.initPopupWidget({url:'CALENDLY_URL'});return false;">
+                        <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        Réserver en ligne
+                    </button>
                 </div>
                 <div class="contact-map-wrapper reveal" id="contact-map">
                     <iframe
@@ -441,11 +488,17 @@
                 <span>Or du Temps</span>
             </div>
             <p class="footer-tagline">L'art du massage à Albi &amp; Toulouse</p>
+            <nav class="footer-links" aria-label="Liens footer">
+                <a href="mentions-legales.html">Mentions légales</a>
+                <span aria-hidden="true">·</span>
+                <a href="mentions-legales.html#rgpd">Politique de confidentialité</a>
+            </nav>
             <p class="footer-copy">&copy; 2026 Or du Temps. Tous droits réservés.</p>
         </div>
     </footer>
 
     <script src="script.js"></script>
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 </body>
 
 </html>

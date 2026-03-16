@@ -147,3 +147,75 @@ createParticles();
     track.closest('.testimonials-section')?.addEventListener('mouseenter', () => clearInterval(timer));
     track.closest('.testimonials-section')?.addEventListener('mouseleave', startAuto);
 })();
+
+/* ══════════════════════════════════
+   6. FORMULAIRE DE CONTACT
+══════════════════════════════════ */
+(function () {
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('form-submit-btn');
+    const feedback = document.getElementById('form-feedback');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = form.querySelector('#contact-name').value.trim();
+        const email = form.querySelector('#contact-email').value.trim();
+        const phone = form.querySelector('#contact-phone').value.trim();
+        const message = form.querySelector('#contact-message').value.trim();
+
+        // Validation côté client
+        let valid = true;
+        [form.querySelector('#contact-name'), form.querySelector('#contact-email'), form.querySelector('#contact-message')].forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('error');
+                valid = false;
+            } else {
+                field.classList.remove('error');
+            }
+        });
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailRegex.test(email)) {
+            form.querySelector('#contact-email').classList.add('error');
+            valid = false;
+        }
+
+        if (!valid) {
+            feedback.textContent = 'Veuillez remplir tous les champs obligatoires.';
+            feedback.className = 'form-feedback error';
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Envoi en cours…';
+        feedback.textContent = '';
+        feedback.className = 'form-feedback';
+
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, phone, message }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                feedback.textContent = 'Votre message a bien été envoyé. Emma vous répondra rapidement.';
+                feedback.className = 'form-feedback success';
+                form.reset();
+            } else {
+                feedback.textContent = data.error || 'Une erreur est survenue. Veuillez réessayer.';
+                feedback.className = 'form-feedback error';
+            }
+        } catch {
+            feedback.textContent = 'Impossible d\'envoyer le message. Veuillez réessayer plus tard.';
+            feedback.className = 'form-feedback error';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Envoyer le message';
+        }
+    });
+})();
