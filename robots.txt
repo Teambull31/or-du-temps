@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /emma.html
 
 Sitemap: https://ordutemps.fr/sitemap.xml

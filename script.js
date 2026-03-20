@@ -8,6 +8,313 @@
  */
 
 /* ══════════════════════════════════
+   0. APPLICATION DE LA CONFIG ADMIN
+   Toutes les modifications faites dans emma.html
+   sont appliquées ici automatiquement au chargement.
+══════════════════════════════════ */
+(function applyConfig() {
+    const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+    if (!Object.keys(cfg).length) return;
+
+    // ── Helpers ──
+    function setImg(sel, val) {
+        if (!val) return;
+        const el = document.querySelector(sel);
+        if (el) el.src = val;
+    }
+    function setText(sel, val) {
+        if (!val) return;
+        const el = document.querySelector(sel);
+        if (el) el.textContent = val;
+    }
+    // Convertit *mot* en <strong>mot</strong>
+    function md(text) {
+        return (text || '').replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
+    }
+    // Formate un tarif : "1h30 · 70 €" → "1h30 · <strong>70 €</strong>"
+    function formatPrix(raw) {
+        if (!raw) return '';
+        if (raw.includes('·')) {
+            const parts = raw.split('·');
+            return parts[0].trim() + ' · <strong>' + parts[1].trim() + '</strong>';
+        }
+        return raw;
+    }
+
+    // ── Photos ──
+    setImg('.hero-bg-img', cfg.hero_image);
+    setImg('.about-img',   cfg.about_image);
+    setImg('.emma-img',    cfg.emma_image);
+
+    // ── Textes hero ──
+    setText('.hero-eyebrow',  cfg.hero_eyebrow);
+    setText('.hero-subtitle', cfg.hero_subtitle);
+
+    // ── Texte "À propos" (2 paragraphes max) ──
+    if (cfg.about_text) {
+        const paras   = cfg.about_text.split('\n\n').filter(p => p.trim());
+        const aboutPs = document.querySelectorAll('.about-text > p:not(.section-eyebrow)');
+        paras.forEach((text, i) => {
+            if (aboutPs[i]) aboutPs[i].innerHTML = md(text.trim());
+        });
+    }
+    if (cfg.about_quote) {
+        const qEl = document.querySelector('.about-quote span');
+        if (qEl) qEl.textContent = '\u201c' + cfg.about_quote + '\u201d';
+    }
+
+    // ── Bio Emma ──
+    if (cfg.emma_bio) {
+        const paras  = cfg.emma_bio.split('\n\n').filter(p => p.trim());
+        const emmaPs = document.querySelectorAll('.emma-text-side > p:not(.section-eyebrow)');
+        paras.forEach((text, i) => {
+            if (emmaPs[i]) emmaPs[i].innerHTML = md(text.trim());
+        });
+    }
+    // Valeurs Emma (3 points forts)
+    const emmaVals = document.querySelectorAll('.emma-value span');
+    if (cfg.emma_value1 && emmaVals[0]) emmaVals[0].textContent = cfg.emma_value1;
+    if (cfg.emma_value2 && emmaVals[1]) emmaVals[1].textContent = cfg.emma_value2;
+    if (cfg.emma_value3 && emmaVals[2]) emmaVals[2].textContent = cfg.emma_value3;
+
+    // ── Chiffres clés ──
+    const statNums = document.querySelectorAll('.stat-number');
+    const statLbls = document.querySelectorAll('.stat-label');
+    if (cfg.stat1_number && statNums[0]) statNums[0].textContent = cfg.stat1_number;
+    if (cfg.stat1_label  && statLbls[0]) statLbls[0].textContent = cfg.stat1_label;
+    if (cfg.stat2_number && statNums[1]) statNums[1].textContent = cfg.stat2_number;
+    if (cfg.stat2_label  && statLbls[1]) statLbls[1].textContent = cfg.stat2_label;
+    if (cfg.stat3_number && statNums[2]) statNums[2].textContent = cfg.stat3_number;
+    if (cfg.stat3_label  && statLbls[2]) statLbls[2].textContent = cfg.stat3_label;
+
+    // ── Téléphone ──
+    if (cfg.phone) {
+        const tel = cfg.phone.replace(/\s/g, '');
+        document.querySelectorAll('a[href^="tel:"]').forEach(a => { a.href = 'tel:' + tel; });
+        const visiblePhone = document.querySelector('#contact-telephone a');
+        if (visiblePhone) visiblePhone.textContent = cfg.phone;
+    }
+
+    // ── Calendly ──
+    if (cfg.calendly_url) {
+        document.querySelectorAll('[onclick*="CALENDLY_URL"]').forEach(btn => {
+            btn.setAttribute('onclick', "Calendly.initPopupWidget({url:'" + cfg.calendly_url + "'});return false;");
+        });
+    }
+
+    // ── Adresse ──
+    const addrEl = document.querySelector('#contact-adresse p');
+    if (addrEl && (cfg.adresse || cfg.adresse_extra !== undefined)) {
+        const lignes = (cfg.adresse || '').replace(/\n/g, '<br>');
+        const extra  = cfg.adresse_extra ? '<br><em>' + cfg.adresse_extra + '</em>' : '';
+        addrEl.innerHTML = lignes + extra;
+    }
+
+    // ── Horaires ──
+    if (cfg.horaires) {
+        const horEl = document.querySelector('#contact-horaires p');
+        if (horEl) horEl.innerHTML = cfg.horaires.replace(/\n/g, '<br>');
+    }
+
+    // ── Tarifs & descriptions des soins ──
+    const soins = {
+        'soin-signature':   { prix: cfg.prix_signature, desc: cfg.desc_signature },
+        'soin-chinois':     { prix: cfg.prix_chinois,   desc: cfg.desc_chinois   },
+        'soin-deep-tissue': { prix: cfg.prix_deep,      desc: cfg.desc_deep      },
+        'soin-suedois':     { prix: cfg.prix_suedois,   desc: cfg.desc_suedois   },
+        'soin-thai':        { prix: cfg.prix_thai,      desc: cfg.desc_thai      },
+        'soin-ado':         { prix: cfg.prix_ado,       desc: cfg.desc_ado       },
+    };
+    Object.entries(soins).forEach(([id, data]) => {
+        const card = document.querySelector('#' + id);
+        if (!card) return;
+        if (data.prix) {
+            const prEl = card.querySelector('.price-tag');
+            if (prEl) prEl.innerHTML = formatPrix(data.prix);
+        }
+        if (data.desc) {
+            const descEl = card.querySelector('.card-body p');
+            if (descEl) descEl.textContent = data.desc;
+        }
+    });
+
+    // ── Bandeau tarifs ──
+    if (cfg.prix_banner) {
+        const bannerEl = document.querySelector('.pricing-banner-inner p');
+        if (bannerEl) bannerEl.innerHTML = '<strong>Tarifs adultes\u00a0:</strong> ' + cfg.prix_banner;
+    }
+
+    // ── WhatsApp ──
+    const waBtn = document.getElementById('whatsapp-btn');
+    if (waBtn) {
+        if (cfg.whatsapp_enabled === false || cfg.whatsapp_enabled === 'false') {
+            waBtn.style.display = 'none';
+        } else {
+            const waNum = (cfg.whatsapp_number || cfg.phone || '0786398886').replace(/[\s+]/g, '');
+            const cleanNum = waNum.startsWith('0') ? '33' + waNum.slice(1) : waNum;
+            waBtn.href = 'https://wa.me/' + cleanNum;
+        }
+    }
+
+    // ── Calendly fallback — si pas configuré, les boutons appellent le tel ──
+    if (!cfg.calendly_url) {
+        document.querySelectorAll('[onclick*="CALENDLY_URL"]').forEach(btn => {
+            const phone = (cfg.phone || '0786398886').replace(/\s/g, '');
+            btn.removeAttribute('onclick');
+            btn.style.cursor = 'pointer';
+            btn.addEventListener('click', () => { window.location.href = 'tel:' + phone; });
+        });
+    }
+
+    // ── Réseaux sociaux ──
+    const socialWrap = document.getElementById('footer-social');
+    const ig = document.getElementById('social-instagram');
+    const fb = document.getElementById('social-facebook');
+    const tt = document.getElementById('social-tiktok');
+    if (cfg.instagram && ig) { ig.href = cfg.instagram; ig.style.display = 'flex'; }
+    if (cfg.facebook && fb) { fb.href = cfg.facebook; fb.style.display = 'flex'; }
+    if (cfg.tiktok && tt) { tt.href = cfg.tiktok; tt.style.display = 'flex'; }
+    if (socialWrap && (cfg.instagram || cfg.facebook || cfg.tiktok)) socialWrap.style.display = 'flex';
+
+    // ── Google My Business ──
+    const gmbEl = document.getElementById('footer-gmb');
+    if (gmbEl && cfg.gmb_url) { gmbEl.href = cfg.gmb_url; gmbEl.style.display = 'flex'; }
+
+    // ── Meta description SEO ──
+    if (cfg.meta_description) {
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cfg.meta_description);
+    }
+
+    // ── Google Maps embed ──
+    if (cfg.map_url) {
+        const mapIframe = document.querySelector('.contact-map-wrapper iframe');
+        if (mapIframe) mapIframe.src = cfg.map_url;
+    }
+
+    // ── Gift CTA phone ──
+    const giftCta = document.getElementById('gift-cta-btn');
+    if (giftCta && cfg.phone) {
+        giftCta.href = 'tel:' + cfg.phone.replace(/\s/g, '');
+    }
+
+    // ── Galerie ──
+    if (cfg.gallery_images && cfg.gallery_images.length) {
+        document.querySelectorAll('.gallery-item').forEach((item, i) => {
+            if (!cfg.gallery_images[i]) return;
+            const img = item.querySelector('.gallery-img');
+            if (img && cfg.gallery_images[i].src) {
+                img.src = cfg.gallery_images[i].src;
+                img.alt = cfg.gallery_images[i].alt || '';
+            }
+        });
+    }
+
+    // ── FAQ ──
+    if (cfg.faq_items && cfg.faq_items.length) {
+        const faqList = document.getElementById('faq-list');
+        if (faqList) {
+            faqList.innerHTML = cfg.faq_items.map(item => `
+                <div class="faq-item reveal">
+                    <button class="faq-question" aria-expanded="false">
+                        <span class="faq-q-text">${item.q}</span>
+                        <span class="faq-arrow" aria-hidden="true">+</span>
+                    </button>
+                    <div class="faq-answer"><p>${item.a}</p></div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // ── Témoignages — reconstruction du slider ──
+    if (cfg.testimonials && cfg.testimonials.length) {
+        const track = document.getElementById('testimonials-track');
+        const nav   = document.querySelector('.testimonials-nav');
+        if (track && nav) {
+            track.innerHTML = cfg.testimonials.map(t => `
+                <div class="testimonial-card">
+                    <div class="stars" aria-label="5 \u00e9toiles">\u2605\u2605\u2605\u2605\u2605</div>
+                    <p>\u201c${t.text}\u201d</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" aria-hidden="true">${(t.name || '?').charAt(0)}</div>
+                        <div><strong>${t.name}</strong><span>${t.city}</span></div>
+                    </div>
+                </div>
+            `).join('');
+            nav.innerHTML = cfg.testimonials.map((_, i) => `
+                <button class="t-dot${i === 0 ? ' t-dot--active' : ''}" aria-label="T\u00e9moignage ${i + 1}"></button>
+            `).join('');
+        }
+    }
+
+    // ── Schema.org — mise à jour dynamique ──
+    const schemaEl = document.getElementById('schema-org');
+    if (schemaEl) {
+        try {
+            const schemaData = JSON.parse(schemaEl.textContent);
+            if (cfg.phone) {
+                const t = cfg.phone.replace(/\s/g, '');
+                schemaData.telephone = t.startsWith('0') ? '+33' + t.slice(1) : t;
+            }
+            if (cfg.adresse) {
+                const lines = cfg.adresse.split('\n');
+                if (lines[0]) schemaData.address.streetAddress = lines[0];
+                if (lines[1]) {
+                    const m = lines[1].match(/^(\d{5})\s+(.+)$/);
+                    if (m) { schemaData.address.postalCode = m[1]; schemaData.address.addressLocality = m[2]; }
+                }
+            }
+            const sameAs = [];
+            if (cfg.instagram) sameAs.push(cfg.instagram);
+            if (cfg.facebook) sameAs.push(cfg.facebook);
+            if (cfg.tiktok) sameAs.push(cfg.tiktok);
+            if (sameAs.length) schemaData.sameAs = sameAs;
+            schemaEl.textContent = JSON.stringify(schemaData);
+        } catch(e) {}
+    }
+
+    // ── Badge de notation Google ──
+    const ratingBadge = document.getElementById('rating-badge');
+    if (ratingBadge && (cfg.google_rating || cfg.google_review_count)) {
+        const scoreEl = document.getElementById('rating-score');
+        const countEl = document.getElementById('rating-count');
+        const linkEl  = document.getElementById('rating-link');
+        if (scoreEl && cfg.google_rating) scoreEl.textContent = cfg.google_rating;
+        if (countEl && cfg.google_review_count) countEl.textContent = cfg.google_review_count;
+        if (linkEl && cfg.gmb_url) linkEl.href = cfg.gmb_url;
+        ratingBadge.style.display = 'flex';
+    }
+
+    // ── Bons cadeaux — montants configurables ──
+    const giftAmountsEl = document.getElementById('gift-amounts');
+    if (giftAmountsEl) {
+        const amounts = [cfg.gift_amount1, cfg.gift_amount2, cfg.gift_amount3].filter(Boolean);
+        if (amounts.length) {
+            giftAmountsEl.innerHTML = amounts.map(a => `<span class="gift-amount-badge">${a}</span>`).join('');
+            giftAmountsEl.style.display = 'flex';
+        }
+    }
+})();
+
+/* ══════════════════════════════════
+   0b. CALENDLY — fallback même sans config
+   (applyConfig retourne tôt si pas de config,
+   ce bloc s'assure que les boutons fonctionnent)
+══════════════════════════════════ */
+(function() {
+    const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+    // Si calendly_url est configuré, applyConfig() a déjà mis à jour les onclick
+    if (cfg.calendly_url) return;
+    // Pas de Calendly → redirige vers le numéro de téléphone
+    const phone = (cfg.phone || '0786398886').replace(/\s/g, '');
+    document.querySelectorAll('[onclick*="CALENDLY_URL"]').forEach(btn => {
+        btn.removeAttribute('onclick');
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', () => { window.location.href = 'tel:' + phone; });
+    });
+})();
+
+/* ══════════════════════════════════
    1. NAVBAR — Glassmorphism au scroll
 ══════════════════════════════════ */
 const navbar = document.getElementById('navbar');
@@ -194,9 +501,18 @@ createParticles();
         feedback.className = 'form-feedback';
 
         try {
-            const res = await fetch('/api/contact', {
+            const cfg2 = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+            const formspreeId = cfg2.formspree_id || '';
+            if (!formspreeId) {
+                feedback.textContent = 'Le formulaire n\'est pas encore configuré. Appelez directement le ' + (cfg2.phone || '07 86 39 88 86') + ' ou envoyez un email.';
+                feedback.className = 'form-feedback error';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Envoyer le message';
+                return;
+            }
+            const res = await fetch('https://formspree.io/f/' + formspreeId, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ name, email, phone, message }),
             });
 
@@ -216,6 +532,267 @@ createParticles();
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Envoyer le message';
+        }
+    });
+})();
+
+/* ══════════════════════════════════
+   7. GALERIE LIGHTBOX
+══════════════════════════════════ */
+(function() {
+    let images = [];
+    let current = 0;
+
+    function buildImages() {
+        images = Array.from(document.querySelectorAll('.gallery-img')).map(img => ({ src: img.src, alt: img.alt }));
+    }
+
+    document.querySelectorAll('.gallery-item').forEach((item, i) => {
+        item.addEventListener('click', () => { buildImages(); openLightboxAt(i); });
+    });
+
+    window.closeLightbox = function() {
+        const lb = document.getElementById('lightbox');
+        if (!lb) return;
+        lb.classList.remove('open');
+        lb.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    };
+
+    window.lightboxNav = function(dir) {
+        if (!images.length) return;
+        current = (current + dir + images.length) % images.length;
+        const img = document.getElementById('lightbox-img');
+        if (img) {
+            img.style.opacity = '0';
+            setTimeout(() => { img.src = images[current].src; img.alt = images[current].alt; img.style.opacity = '1'; }, 180);
+        }
+    };
+
+    function openLightboxAt(i) {
+        current = i;
+        const lb = document.getElementById('lightbox');
+        const img = document.getElementById('lightbox-img');
+        if (!lb || !img || !images[i]) return;
+        img.src = images[i].src;
+        img.alt = images[i].alt;
+        img.style.opacity = '1';
+        lb.classList.add('open');
+        lb.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    document.addEventListener('keydown', e => {
+        const lb = document.getElementById('lightbox');
+        if (!lb?.classList.contains('open')) return;
+        if (e.key === 'Escape') window.closeLightbox();
+        if (e.key === 'ArrowLeft') window.lightboxNav(-1);
+        if (e.key === 'ArrowRight') window.lightboxNav(1);
+    });
+})();
+
+/* ══════════════════════════════════
+   8. FAQ ACCORDÉON
+══════════════════════════════════ */
+function initFaqListeners(container) {
+    (container || document).querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const answer = btn.nextElementSibling;
+            const isOpen = btn.getAttribute('aria-expanded') === 'true';
+            (container || document).querySelectorAll('.faq-question').forEach(other => {
+                if (other !== btn) {
+                    other.setAttribute('aria-expanded', 'false');
+                    other.nextElementSibling?.classList.remove('open');
+                }
+            });
+            btn.setAttribute('aria-expanded', String(!isOpen));
+            answer?.classList.toggle('open', !isOpen);
+        });
+    });
+}
+initFaqListeners();
+
+/* ══════════════════════════════════
+   9. BACK TO TOP
+══════════════════════════════════ */
+(function() {
+    const btn = document.getElementById('back-to-top');
+    if (!btn) return;
+    window.addEventListener('scroll', () => {
+        btn.classList.toggle('visible', window.scrollY > 500);
+    }, { passive: true });
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+})();
+
+/* ══════════════════════════════════
+   10. COOKIE BANNER RGPD
+══════════════════════════════════ */
+(function() {
+    const banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+    const consent = localStorage.getItem('ordutemps_cookies');
+
+    if (consent === null) {
+        setTimeout(() => banner.classList.add('visible'), 1200);
+    } else if (consent === 'true') {
+        loadGA();
+    }
+
+    window.setCookieConsent = function(accepted) {
+        localStorage.setItem('ordutemps_cookies', String(accepted));
+        banner.classList.remove('visible');
+        if (accepted) loadGA();
+    };
+
+    function loadGA() {
+        const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+        const gaId = cfg.ga_id;
+        if (!gaId || window._gaInit) return;
+        window._gaInit = true;
+        const s = document.createElement('script');
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+        s.async = true;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function() { window.dataLayer.push(arguments); };
+        window.gtag('js', new Date());
+        window.gtag('config', gaId);
+    }
+})();
+
+/* ══════════════════════════════════
+   11. ACCÈS ADMIN — 5 clics sur le logo footer
+   (discret, non visible pour les visiteurs)
+══════════════════════════════════ */
+(function () {
+    const footerBrand = document.querySelector('.footer-brand');
+    if (!footerBrand) return;
+
+    let clicks = 0;
+    let timer;
+
+    footerBrand.style.cursor = 'default';
+    footerBrand.addEventListener('click', () => {
+        clicks++;
+        clearTimeout(timer);
+        // Réinitialise le compteur après 3 secondes d'inactivité
+        timer = setTimeout(() => { clicks = 0; }, 3000);
+        if (clicks >= 5) {
+            clicks = 0;
+            window.location.href = 'emma.html';
+        }
+    });
+})();
+
+/* ══════════════════════════════════
+   12. ANIMATION DES CHIFFRES CLÉS
+   Les stats comptent de 0 jusqu'à leur valeur
+══════════════════════════════════ */
+(function() {
+    function animateCounter(el) {
+        const raw = el.textContent.trim();
+        const match = raw.match(/^(\d+(?:\.\d+)?)(\D*)$/);
+        if (!match) return; // "7j/7" etc. — pas animable
+        const target = parseFloat(match[1]);
+        const suffix = match[2];
+        const duration = 1600;
+        const start = performance.now();
+        function step(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = (Number.isInteger(target) ? Math.round(eased * target) : (eased * target).toFixed(1)) + suffix;
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.querySelectorAll('.stat-number').forEach(animateCounter);
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsBand = document.querySelector('.stats-band');
+    if (statsBand) statsObserver.observe(statsBand);
+})();
+
+/* ══════════════════════════════════
+   13. SCROLL SPY — Nav active au scroll
+══════════════════════════════════ */
+(function() {
+    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+    if (!navLinks.length) return;
+
+    const sectionIds = Array.from(navLinks).map(l => l.getAttribute('href').slice(1));
+    const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+    const spyObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            navLinks.forEach(link => {
+                link.classList.toggle('nav-link--active', link.getAttribute('href') === '#' + id);
+            });
+        });
+    }, {
+        threshold: 0.25,
+        rootMargin: '-' + (typeof window !== 'undefined' ? 72 : 72) + 'px 0px -40% 0px'
+    });
+
+    sections.forEach(s => spyObserver.observe(s));
+})();
+
+/* ══════════════════════════════════
+   14. BARRE DE PROGRESSION AU SCROLL
+══════════════════════════════════ */
+(function() {
+    const bar = document.getElementById('scroll-progress');
+    if (!bar) return;
+    function updateBar() {
+        const scrolled = window.scrollY;
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = total > 0 ? (scrolled / total * 100).toFixed(2) + '%' : '0%';
+    }
+    window.addEventListener('scroll', updateBar, { passive: true });
+    updateBar();
+})();
+
+/* ══════════════════════════════════
+   15. SKELETON LOADING — Galerie
+══════════════════════════════════ */
+(function() {
+    document.querySelectorAll('.gallery-img').forEach(img => {
+        if (img.complete && img.naturalWidth > 0) return;
+        const item = img.closest('.gallery-item');
+        if (item) item.classList.add('loading');
+        img.addEventListener('load', () => item?.classList.remove('loading'));
+        img.addEventListener('error', () => item?.classList.remove('loading'));
+    });
+})();
+
+/* ══════════════════════════════════
+   16. BOUTON PARTAGER (Web Share API)
+══════════════════════════════════ */
+(function() {
+    const btn = document.getElementById('share-btn');
+    if (!btn) return;
+    if (!navigator.share) { btn.style.display = 'none'; return; }
+    btn.style.display = 'inline-flex';
+    btn.addEventListener('click', async () => {
+        const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+        try {
+            await navigator.share({
+                title: 'Or du Temps — Massage Bien-être',
+                text: cfg.hero_subtitle || 'Une parenthèse hors du temps pour votre corps et votre esprit.',
+                url: window.location.href
+            });
+        } catch(e) {
+            if (e.name !== 'AbortError') {
+                await navigator.clipboard?.writeText(window.location.href).catch(() => {});
+            }
         }
     });
 })();

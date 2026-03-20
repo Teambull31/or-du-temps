@@ -1,0 +1,83 @@
+# ============================================================
+#  Or du Temps — Déploiement automatique sur VPS
+#  Déclenché à chaque push sur la branche main
+#
+#  Secrets GitHub à configurer (Settings → Secrets → Actions) :
+#    VPS_HOST     → IP ou hostname de ton VPS
+#    VPS_USER     → deploy
+#    VPS_SSH_KEY  → contenu de ta clé privée SSH (-----BEGIN...)
+#    VPS_PORT     → 22 (ou ton port SSH personnalisé)
+# ============================================================
+
+name: 🚀 Deploy Or du Temps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # Déploiement manuel possible depuis GitHub
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false # Ne jamais annuler un déploiement en cours
+
+jobs:
+  deploy:
+    name: Déploiement sur VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # ── 1. Récupération du code ─────────────────────────────
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Configuration SSH ────────────────────────────────
+      - name: 🔑 Configurer SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.VPS_PORT || '22' }}" \
+            -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      # ── 3. Déploiement des fichiers ─────────────────────────
+      - name: 📦 Déployer les fichiers (rsync)
+        run: |
+          rsync -avz --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='devops/' \
+            --exclude='*.md' \
+            --exclude='.gitignore' \
+            --exclude='node_modules/' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.VPS_PORT || '22' }} -o StrictHostKeyChecking=no" \
+            ./ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/ordutemps/
+
+      # ── 4. Permissions + rechargement Nginx ─────────────────
+      - name: 🔄 Recharger Nginx
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -p "${{ secrets.VPS_PORT || '22' }}" \
+            -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "sudo nginx -t && sudo systemctl reload nginx"
+
+      # ── 5. Vérification live ────────────────────────────────
+      - name: ✅ Vérification HTTP
+        run: |
+          sleep 3
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 10 \
+            "https://ordutemps.fr" || echo "000")
+          echo "Statut HTTP : $STATUS"
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "301" ]; then
+            echo "⚠️  Le site répond avec le statut $STATUS"
+            exit 1
+          fi
+          echo "✅  Site en ligne et opérationnel"
+
+      # ── 6. Nettoyage clé SSH ────────────────────────────────
+      - name: 🧹 Nettoyage
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

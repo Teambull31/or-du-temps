@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Admin — Or du Temps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4A843;
+            --gold-light: #F0CC74;
+            --noir: #0A0806;
+            --noir-2: #110D09;
+            --noir-3: #1A1310;
+            --noir-4: #252018;
+            --ivory: #F6F0E4;
+            --ivory-dim: #C8BAA0;
+            --glass-border: rgba(212,168,67,.2);
+            --glass-bg: rgba(255,240,210,.04);
+            --red: #e05a5a;
+            --green: #7ec87e;
+            --font-heading: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-body);
+            background: var(--noir);
+            color: var(--ivory);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* ══ LOGIN ══ */
+        .login-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,168,67,.08) 0%, transparent 60%), var(--noir);
+        }
+        .login-card {
+            background: var(--noir-3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+        .login-logo {
+            display: flex; align-items: center; justify-content: center; gap: .6rem;
+            font-family: var(--font-heading); font-size: 1.6rem; color: var(--gold); margin-bottom: 1.5rem;
+        }
+        .login-card h1 { font-family: var(--font-heading); font-weight: 300; font-size: 1.8rem; color: var(--ivory); margin-bottom: .5rem; }
+        .login-hint { font-size: .88rem; color: var(--ivory-dim); margin-bottom: 2rem; line-height: 1.6; }
+        .login-form { display: flex; flex-direction: column; gap: 1rem; }
+        .login-form input[type="password"] {
+            background: rgba(255,255,255,.04); border: 1px solid var(--glass-border); border-radius: 6px;
+            padding: .9rem 1rem; font-family: var(--font-body); font-size: 1rem; color: var(--ivory);
+            outline: none; transition: border-color .3s, box-shadow .3s; text-align: center; letter-spacing: .1em;
+        }
+        .login-form input[type="password"]:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,67,.1); }
+        .login-form input.shake { animation: shake .4s; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+        .btn-login {
+            background: var(--gold); color: var(--noir); border: none; border-radius: 30px; padding: .9rem;
+            font-family: var(--font-body); font-size: .92rem; font-weight: 500; letter-spacing: .08em;
+            cursor: pointer; transition: background .3s, transform .3s, box-shadow .3s;
+        }
+        .btn-login:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,168,67,.3); }
+        .login-error { color: var(--red); font-size: .83rem; display: none; }
+        .login-error.visible { display: block; }
+
+        /* ══ ADMIN PANEL ══ */
+        #admin-panel { display: none; }
+        #admin-panel.visible { display: block; }
+
+        .admin-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10,8,6,.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0 1.5rem; display: flex; align-items: center; gap: 1.5rem; height: 64px;
+        }
+        .admin-logo {
+            display: flex; align-items: center; gap: .5rem;
+            font-family: var(--font-heading); font-size: 1.2rem; color: var(--gold); white-space: nowrap; flex-shrink: 0;
+        }
+        .admin-badge {
+            font-family: var(--font-body); font-size: .62rem; letter-spacing: .15em; text-transform: uppercase;
+            color: var(--ivory-dim); border: 1px solid var(--glass-border); border-radius: 20px; padding: .2rem .6rem;
+        }
+        .admin-tabs { display: flex; gap: .2rem; flex: 1; overflow-x: auto; scrollbar-width: none; }
+        .admin-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            background: none; border: none; color: var(--ivory-dim); font-family: var(--font-body);
+            font-size: .8rem; letter-spacing: .05em; padding: .45rem .85rem; border-radius: 20px;
+            cursor: pointer; white-space: nowrap; transition: color .25s, background .25s;
+        }
+        .tab-btn:hover { color: var(--ivory); background: rgba(255,255,255,.05); }
+        .tab-btn.active { color: var(--noir); background: var(--gold); font-weight: 500; }
+        .admin-header-actions { display: flex; align-items: center; gap: .6rem; flex-shrink: 0; }
+        .link-preview {
+            font-size: .78rem; color: var(--ivory-dim); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: .4rem .85rem; transition: color .25s, border-color .25s; white-space: nowrap;
+        }
+        .link-preview:hover { color: var(--gold); border-color: var(--gold); }
+        .btn-logout {
+            background: none; border: 1px solid rgba(255,255,255,.12); color: var(--ivory-dim);
+            border-radius: 20px; padding: .4rem .85rem; font-family: var(--font-body); font-size: .78rem;
+            cursor: pointer; transition: all .25s; white-space: nowrap;
+        }
+        .btn-logout:hover { border-color: var(--red); color: var(--red); }
+        .btn-save {
+            background: var(--gold); color: var(--noir); border: none; border-radius: 20px;
+            padding: .5rem 1.3rem; font-family: var(--font-body); font-size: .82rem; font-weight: 500;
+            cursor: pointer; transition: background .25s, transform .25s; white-space: nowrap;
+        }
+        .btn-save:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+        /* ══ SECTIONS ══ */
+        .admin-main { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .section-title-admin { font-family: var(--font-heading); font-size: 2rem; font-weight: 300; color: var(--ivory); margin-bottom: .5rem; }
+        .section-desc { font-size: .88rem; color: var(--ivory-dim); line-height: 1.65; margin-bottom: 2.5rem; border-left: 2px solid var(--glass-border); padding-left: 1rem; }
+        .section-block { background: var(--noir-3); border: 1px solid var(--glass-border); border-radius: 10px; padding: 1.75rem; margin-bottom: 1.5rem; }
+        .block-title { font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem; font-weight: 500; }
+
+        /* Fields */
+        .field-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1.25rem; }
+        .field-group:last-child { margin-bottom: 0; }
+        .field-label { font-size: .78rem; font-weight: 500; letter-spacing: .07em; color: var(--ivory); }
+        .field-help { font-size: .73rem; color: var(--ivory-dim); line-height: 1.5; }
+        .field-input, .field-textarea {
+            background: rgba(255,255,255,.04); border: 1px solid var(--glass-border); border-radius: 6px;
+            padding: .8rem 1rem; font-family: var(--font-body); font-size: .9rem; color: var(--ivory);
+            outline: none; transition: border-color .3s, box-shadow .3s; width: 100%;
+        }
+        .field-input::placeholder, .field-textarea::placeholder { color: rgba(200,185,160,.35); }
+        .field-input:focus, .field-textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,67,.1); }
+        .field-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+        /* Photos */
+        .photo-editor { display: flex; gap: 1.5rem; align-items: flex-start; margin-bottom: 1.5rem; }
+        .photo-editor:last-child { margin-bottom: 0; }
+        .photo-thumb { width: 110px; height: 80px; border-radius: 6px; object-fit: cover; border: 1px solid var(--glass-border); flex-shrink: 0; background: var(--noir-4); }
+        .photo-controls { flex: 1; display: flex; flex-direction: column; gap: .6rem; }
+        .photo-label { font-size: .8rem; font-weight: 500; color: var(--ivory); display: block; }
+        .photo-help { font-size: .73rem; color: var(--ivory-dim); }
+        .upload-label {
+            display: inline-flex; align-items: center; gap: .5rem; font-size: .78rem; color: var(--gold);
+            border: 1px dashed rgba(212,168,67,.35); border-radius: 5px; padding: .45rem .85rem;
+            cursor: pointer; transition: border-color .25s, background .25s; width: fit-content;
+        }
+        .upload-label:hover { border-color: var(--gold); background: rgba(212,168,67,.06); }
+        .upload-label input[type="file"] { display: none; }
+
+        /* Tarifs grid */
+        .tarifs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .tarif-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 1rem 1.25rem; }
+        .tarif-name { font-size: .82rem; font-weight: 500; color: var(--ivory); margin-bottom: .6rem; }
+        .tarif-example { font-size: .7rem; color: var(--ivory-dim); margin-top: .4rem; }
+
+        /* Textes - stats grid */
+        .stats-admin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        .stat-admin-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 1rem; }
+        .stat-admin-label { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: .75rem; }
+
+        /* Témoignages */
+        .testimonial-admin-item {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;
+            padding: 1.25rem; margin-bottom: 1rem;
+        }
+        .testi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .testi-num { font-size: .72rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+        .btn-remove-testi {
+            background: none; border: 1px solid rgba(224,90,90,.3); color: var(--red);
+            border-radius: 4px; padding: .25rem .6rem; font-size: .75rem; cursor: pointer;
+            transition: background .25s, color .25s;
+        }
+        .btn-remove-testi:hover { background: var(--red); color: #fff; }
+        .testi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn-add-testi {
+            display: flex; align-items: center; justify-content: center; gap: .5rem;
+            width: 100%; padding: .85rem; background: none; border: 1px dashed rgba(212,168,67,.3);
+            color: var(--gold); font-family: var(--font-body); font-size: .85rem; border-radius: 8px;
+            cursor: pointer; transition: background .25s, border-color .25s;
+        }
+        .btn-add-testi:hover { background: rgba(212,168,67,.06); border-color: var(--gold); }
+        .empty-testi { text-align: center; padding: 2rem; color: var(--ivory-dim); font-size: .88rem; }
+
+        /* Sécurité */
+        .security-info {
+            background: rgba(212,168,67,.06); border: 1px solid rgba(212,168,67,.2);
+            border-radius: 8px; padding: 1rem 1.25rem; font-size: .85rem; color: var(--ivory-dim);
+            margin-bottom: 1.5rem; line-height: 1.6;
+        }
+        .security-info strong { color: var(--gold); }
+        .btn-action {
+            display: inline-flex; align-items: center; gap: .5rem;
+            background: transparent; color: var(--gold); border: 1px solid var(--gold);
+            border-radius: 6px; padding: .65rem 1.4rem; font-family: var(--font-body); font-size: .88rem;
+            font-weight: 500; cursor: pointer; transition: background .25s, color .25s; margin-top: .5rem;
+        }
+        .btn-action:hover { background: var(--gold); color: var(--noir); }
+        .btn-danger { border-color: var(--red); color: var(--red); }
+        .btn-danger:hover { background: var(--red); color: #fff; border-color: var(--red); }
+        .feedback-msg { font-size: .83rem; margin-top: .75rem; min-height: 1.2em; }
+        .feedback-msg.success { color: var(--green); }
+        .feedback-msg.error { color: var(--red); }
+        .security-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .5rem; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 2rem; left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            font-weight: 500; font-size: .88rem; padding: .75rem 1.75rem;
+            border-radius: 30px; opacity: 0; transition: opacity .3s, transform .3s;
+            pointer-events: none; z-index: 9999; white-space: nowrap;
+        }
+        .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Divider */
+        .block-divider { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 1.5rem 0; }
+
+        @media (max-width: 640px) {
+            .admin-header { padding: 0 1rem; height: auto; padding: .7rem 1rem; flex-wrap: wrap; gap: .75rem; }
+            .tarifs-grid, .stats-admin-grid { grid-template-columns: 1fr; }
+            .testi-row { grid-template-columns: 1fr; }
+            .photo-editor { flex-direction: column; }
+            .photo-thumb { width: 100%; height: 140px; }
+        }
+
+        /* Dirty state — modifications non sauvegardées */
+        .btn-save.dirty {
+            background: #e8965a;
+            animation: btn-pulse .8s ease-in-out infinite alternate;
+        }
+        .btn-save.dirty::before { content: '• '; }
+        @keyframes btn-pulse { from { opacity: 1; } to { opacity: .8; } }
+
+        /* Prévisualisation responsive */
+        .preview-modal {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,.95); display: none;
+            flex-direction: column;
+        }
+        .preview-modal.open { display: flex; }
+        .preview-toolbar {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .75rem 1.5rem; background: var(--noir-3);
+            border-bottom: 1px solid var(--glass-border); flex-shrink: 0;
+        }
+        .preview-toolbar span { font-size: .82rem; color: var(--ivory-dim); margin-right: .5rem; }
+        .btn-device {
+            background: none; border: 1px solid var(--glass-border); color: var(--ivory-dim);
+            border-radius: 20px; padding: .35rem .9rem; font-family: var(--font-body);
+            font-size: .75rem; cursor: pointer; transition: all .25s;
+        }
+        .btn-device.active { background: var(--gold); color: var(--noir); border-color: var(--gold); }
+        .btn-close-preview {
+            margin-left: auto; background: none; border: 1px solid rgba(255,255,255,.15);
+            color: var(--ivory-dim); border-radius: 20px; padding: .35rem .9rem;
+            font-family: var(--font-body); font-size: .78rem; cursor: pointer; transition: all .25s;
+        }
+        .btn-close-preview:hover { border-color: var(--red); color: var(--red); }
+        .preview-frame-wrap {
+            flex: 1; display: flex; justify-content: center; align-items: flex-start;
+            overflow: auto; padding: 1.5rem; background: #111;
+        }
+        .preview-frame-wrap iframe {
+            border: none; border-radius: 8px; transition: width .4s cubic-bezier(0.16,1,.3,1);
+            box-shadow: 0 20px 60px rgba(0,0,0,.8); height: 800px; background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     ÉCRAN DE CONNEXION
+══════════════════════════════════ -->
+<div id="login-screen" class="login-wrap">
+    <div class="login-card">
+        <div class="login-logo">
+            <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#C9A84C" stroke-width="1.5"/>
+                <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" opacity="0.85"/>
+                <circle cx="20" cy="20" r="3" fill="#C9A84C"/>
+            </svg>
+            Or du Temps
+        </div>
+        <h1>Espace Administrateur</h1>
+        <p class="login-hint">Entrez votre mot de passe pour accéder au panneau de gestion de votre site.</p>
+        <form class="login-form" id="login-form">
+            <input type="password" id="pwd-input" placeholder="Mot de passe" autocomplete="current-password">
+            <button type="submit" class="btn-login">Accéder →</button>
+            <span class="login-error" id="login-error">Mot de passe incorrect. Réessayez.</span>
+        </form>
+        <p style="font-size:.72rem;color:rgba(200,185,160,.3);margin-top:2rem;">Or du Temps — Administration</p>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PANNEAU ADMIN
+══════════════════════════════════ -->
+<div id="admin-panel">
+    <header class="admin-header">
+        <div class="admin-logo">
+            <svg width="20" height="20" viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" stroke="#C9A84C" stroke-width="1.5"/>
+                <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" opacity="0.85"/>
+            </svg>
+            Or du Temps
+            <span class="admin-badge">Admin</span>
+        </div>
+        <nav class="admin-tabs" role="tablist">
+            <button class="tab-btn active" onclick="showSection('photos')" data-tab="photos">📷 Photos</button>
+            <button class="tab-btn" onclick="showSection('textes')" data-tab="textes">✍️ Textes</button>
+            <button class="tab-btn" onclick="showSection('tarifs')" data-tab="tarifs">💰 Tarifs</button>
+            <button class="tab-btn" onclick="showSection('temoignages')" data-tab="temoignages">⭐ Témoignages</button>
+            <button class="tab-btn" onclick="showSection('contenu')" data-tab="contenu">🖼️ Galerie &amp; FAQ</button>
+            <button class="tab-btn" onclick="showSection('contact')" data-tab="contact">📍 Contact</button>
+            <button class="tab-btn" onclick="showSection('securite')" data-tab="securite">🔒 Sécurité</button>
+        </nav>
+        <div class="admin-header-actions">
+            <button class="link-preview" onclick="openPreview()" style="cursor:pointer;background:none;">Prévisualiser ↗</button>
+            <a href="index.html" target="_blank" class="link-preview">Voir le site ↗</a>
+            <button class="btn-logout" onclick="logout()">Déconnexion</button>
+            <button class="btn-save" onclick="saveConfig()">Enregistrer</button>
+        </div>
+    </header>
+
+    <main class="admin-main">
+
+        <!-- ══ PHOTOS ══ -->
+        <div id="section-photos" class="admin-section active">
+            <h2 class="section-title-admin">Photos</h2>
+            <p class="section-desc">Modifiez les 3 photos principales du site. Collez l'adresse d'une photo depuis internet, ou choisissez une photo depuis votre ordinateur. Pour des photos depuis l'ordi, préférez des fichiers inférieurs à 4 Mo.</p>
+
+            <div class="section-block">
+                <p class="block-title">Photo d'accueil — grande image de fond</p>
+                <div class="photo-editor">
+                    <img id="preview-hero" class="photo-thumb" src="" alt="" onerror="this.style.opacity='.2'">
+                    <div class="photo-controls">
+                        <span class="photo-label">Bandeau principal (page d'accueil)</span>
+                        <span class="photo-help">Grande photo en arrière-plan dès qu'on arrive sur le site.</span>
+                        <input type="url" id="hero_image" class="field-input" placeholder="https://…" oninput="updatePreview('hero_image','preview-hero')">
+                        <label class="upload-label">
+                            <input type="file" accept="image/*" onchange="handleUpload('hero_image','preview-hero',this)">
+                            ＋ Depuis l'ordinateur
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Photo "L'Institut" — section À propos</p>
+                <div class="photo-editor">
+                    <img id="preview-about" class="photo-thumb" src="" alt="" onerror="this.style.opacity='.2'">
+                    <div class="photo-controls">
+                        <span class="photo-label">Photo de la salle de soin</span>
+                        <span class="photo-help">Affichée dans la section de présentation de votre institut.</span>
+                        <input type="url" id="about_image" class="field-input" placeholder="https://…" oninput="updatePreview('about_image','preview-about')">
+                        <label class="upload-label">
+                            <input type="file" accept="image/*" onchange="handleUpload('about_image','preview-about',this)">
+                            ＋ Depuis l'ordinateur
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Votre photo — section Praticienne</p>
+                <div class="photo-editor">
+                    <img id="preview-emma" class="photo-thumb" src="" alt="" onerror="this.style.opacity='.2'">
+                    <div class="photo-controls">
+                        <span class="photo-label">Photo d'Emma Garcia</span>
+                        <span class="photo-help">Affichée dans la section "Votre Praticienne".</span>
+                        <input type="url" id="emma_image" class="field-input" placeholder="https://…" oninput="updatePreview('emma_image','preview-emma')">
+                        <label class="upload-label">
+                            <input type="file" accept="image/*" onchange="handleUpload('emma_image','preview-emma',this)">
+                            ＋ Depuis l'ordinateur
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ TEXTES ══ -->
+        <div id="section-textes" class="admin-section">
+            <h2 class="section-title-admin">Textes</h2>
+            <p class="section-desc">Modifiez tous les textes du site. Pour mettre un mot <strong>en gras</strong>, entourez-le d'astérisques : <code style="color:var(--gold)">*mot*</code>. Pour aller à la ligne dans un texte long, laissez une ligne vide entre deux paragraphes.</p>
+
+            <div class="section-block">
+                <p class="block-title">Page d'accueil — textes du haut</p>
+                <div class="field-group">
+                    <label class="field-label">Accroche (petite ligne au-dessus du titre)</label>
+                    <input type="text" id="hero_eyebrow" class="field-input" placeholder="Institut de Bien-être · Albi & Toulouse">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Sous-titre (phrase sous le titre principal)</label>
+                    <input type="text" id="hero_subtitle" class="field-input" placeholder="Une parenthèse hors du temps pour votre corps et votre esprit.">
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Section "L'Institut" — présentation</p>
+                <div class="field-group">
+                    <label class="field-label">Texte de présentation de l'institut</label>
+                    <textarea id="about_text" class="field-textarea" rows="6" placeholder="Paragraphe 1…&#10;&#10;Paragraphe 2… (laissez une ligne vide entre les paragraphes)"></textarea>
+                    <span class="field-help">Séparez vos paragraphes par une ligne vide. Exemple de gras : *une expérience unique*</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Citation (mise en avant avec un trait doré)</label>
+                    <input type="text" id="about_quote" class="field-input" placeholder="Le corps parle. Le massage l'écoute.">
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Section "Emma Garcia" — votre présentation</p>
+                <div class="field-group">
+                    <label class="field-label">Votre biographie</label>
+                    <textarea id="emma_bio" class="field-textarea" rows="6" placeholder="Paragraphe 1…&#10;&#10;Paragraphe 2… (laissez une ligne vide entre les paragraphes)"></textarea>
+                    <span class="field-help">Séparez vos paragraphes par une ligne vide. Exemple de gras : *personnalisée et intuitive*</span>
+                </div>
+                <hr class="block-divider">
+                <p class="field-label" style="margin-bottom:.75rem">Vos 3 points forts (icônes dorées)</p>
+                <div class="field-group">
+                    <label class="field-label">Point fort 1</label>
+                    <input type="text" id="emma_value1" class="field-input" placeholder="Formations multi-culturelles">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Point fort 2</label>
+                    <input type="text" id="emma_value2" class="field-input" placeholder="Écoute et bienveillance">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Point fort 3</label>
+                    <input type="text" id="emma_value3" class="field-input" placeholder="Soins personnalisés">
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">SEO — Référencement Google</p>
+                <div class="field-group">
+                    <label class="field-label" style="display:flex;align-items:center;justify-content:space-between;">
+                        Description du site (meta description)
+                        <span id="meta-desc-count" style="font-size:.7rem;font-weight:400;color:var(--ivory-dim);">0 / 160</span>
+                    </label>
+                    <textarea id="meta_description" class="field-textarea" rows="3" placeholder="Massages signature, chinois, deep tissue, suédois et thaï..." oninput="updateMetaCount(this)"></textarea>
+                    <span class="field-help">Idéalement entre 120 et 160 caractères. Apparaît dans les résultats Google.</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Identifiant Google Analytics (optionnel)</label>
+                    <input type="text" id="ga_id" class="field-input" placeholder="G-XXXXXXXXXX">
+                    <span class="field-help">Fonctionne uniquement si le visiteur accepte les cookies.</span>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Bandeau de chiffres clés</p>
+                <div class="stats-admin-grid">
+                    <div class="stat-admin-card">
+                        <p class="stat-admin-label">Chiffre 1</p>
+                        <div class="field-group"><label class="field-label">Nombre</label><input type="text" id="stat1_number" class="field-input" placeholder="5+"></div>
+                        <div class="field-group"><label class="field-label">Description</label><input type="text" id="stat1_label" class="field-input" placeholder="Techniques de massage"></div>
+                    </div>
+                    <div class="stat-admin-card">
+                        <p class="stat-admin-label">Chiffre 2</p>
+                        <div class="field-group"><label class="field-label">Nombre</label><input type="text" id="stat2_number" class="field-input" placeholder="2"></div>
+                        <div class="field-group"><label class="field-label">Description</label><input type="text" id="stat2_label" class="field-input" placeholder="Villes — Albi & Toulouse"></div>
+                    </div>
+                    <div class="stat-admin-card">
+                        <p class="stat-admin-label">Chiffre 3</p>
+                        <div class="field-group"><label class="field-label">Nombre</label><input type="text" id="stat3_number" class="field-input" placeholder="7j/7"></div>
+                        <div class="field-group"><label class="field-label">Description</label><input type="text" id="stat3_label" class="field-input" placeholder="Disponible pour vous"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ TARIFS ══ -->
+        <div id="section-tarifs" class="admin-section">
+            <h2 class="section-title-admin">Tarifs &amp; Soins</h2>
+            <p class="section-desc">Modifiez le prix et la description de chaque soin. Pour le tarif, exemples : <em>1h30 · 70 €</em>, <em>1h · 50 €</em>, <em>Sur devis</em>.</p>
+
+            <div class="section-block">
+                <p class="block-title">Massage Signature</p>
+                <div class="field-group">
+                    <label class="field-label">Tarif affiché</label>
+                    <input type="text" id="prix_signature" class="field-input" placeholder="1h30 · 70 €">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description du soin</label>
+                    <textarea id="desc_signature" class="field-textarea" rows="3" placeholder="Description du massage signature..."></textarea>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Soin Adolescent</p>
+                <div class="field-group">
+                    <label class="field-label">Tarif affiché</label>
+                    <input type="text" id="prix_ado" class="field-input" placeholder="1h · 50 €">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description du soin</label>
+                    <textarea id="desc_ado" class="field-textarea" rows="3" placeholder="Description du soin adolescent..."></textarea>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Massage Chinois</p>
+                <div class="field-group">
+                    <label class="field-label">Tarif affiché</label>
+                    <input type="text" id="prix_chinois" class="field-input" placeholder="Sur devis">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description du soin</label>
+                    <textarea id="desc_chinois" class="field-textarea" rows="3" placeholder="Description du massage chinois..."></textarea>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Deep Tissue</p>
+                <div class="field-group">
+                    <label class="field-label">Tarif affiché</label>
+                    <input type="text" id="prix_deep" class="field-input" placeholder="Sur devis">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description du soin</label>
+                    <textarea id="desc_deep" class="field-textarea" rows="3" placeholder="Description du deep tissue..."></textarea>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Massage Suédois</p>
+                <div class="field-group">
+                    <label class="field-label">Tarif affiché</label>
+                    <input type="text" id="prix_suedois" class="field-input" placeholder="Sur devis">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description du soin</label>
+                    <textarea id="desc_suedois" class="field-textarea" rows="3" placeholder="Description du massage suédois..."></textarea>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Massage Thaï</p>
+                <div class="field-group">
+                    <label class="field-label">Tarif affiché</label>
+                    <input type="text" id="prix_thai" class="field-input" placeholder="Sur devis">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description du soin</label>
+                    <textarea id="desc_thai" class="field-textarea" rows="3" placeholder="Description du massage thaï..."></textarea>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Bandeau récapitulatif des tarifs adultes</p>
+                <div class="field-group">
+                    <label class="field-label">Texte du bandeau en bas de la section soins</label>
+                    <input type="text" id="prix_banner" class="field-input" placeholder="1h30 – 70 € | 2h – 90 €">
+                    <span class="field-help">Séparez les durées avec un | : 1h30 – 70 € | 2h – 90 €</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ TÉMOIGNAGES ══ -->
+        <div id="section-temoignages" class="admin-section">
+            <h2 class="section-title-admin">Témoignages clients</h2>
+            <p class="section-desc">Ajoutez, modifiez ou supprimez les avis clients affichés sur votre site. Les modifications s'appliquent après avoir cliqué sur <strong>Enregistrer</strong>.</p>
+
+            <div class="section-block">
+                <p class="block-title">Liste des témoignages</p>
+                <div id="testimonials-list"></div>
+                <button class="btn-add-testi" onclick="addTestimonial()">＋ Ajouter un avis client</button>
+            </div>
+        </div>
+
+        <!-- ══ GALERIE & FAQ ══ -->
+        <div id="section-contenu" class="admin-section">
+            <h2 class="section-title-admin">Galerie &amp; FAQ</h2>
+            <p class="section-desc">Gérez les 6 photos de la galerie et les questions fréquentes affichées sur votre site.</p>
+
+            <div class="section-block">
+                <p class="block-title">Photos de la galerie</p>
+                <div id="gallery-admin-list"><!-- généré par JS --></div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Questions fréquentes (FAQ)</p>
+                <div id="faq-admin-list"></div>
+                <button class="btn-add-testi" onclick="addFaqItem()" style="margin-top:1rem;">＋ Ajouter une question</button>
+            </div>
+        </div>
+
+        <!-- ══ CONTACT ══ -->
+        <div id="section-contact" class="admin-section">
+            <h2 class="section-title-admin">Contact &amp; Lieux</h2>
+            <p class="section-desc">Mettez à jour vos coordonnées, horaires et localisation. Ces informations apparaissent dans la section Contact de votre site.</p>
+
+            <div class="section-block">
+                <p class="block-title">Téléphone</p>
+                <div class="field-group">
+                    <label class="field-label">Numéro de téléphone</label>
+                    <input type="tel" id="phone" class="field-input" placeholder="07 86 39 88 86">
+                    <span class="field-help">Ce numéro sera cliquable sur mobile. Format recommandé : 07 86 39 88 86</span>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Adresse &amp; localisation</p>
+                <div class="field-group">
+                    <label class="field-label">Adresse principale (Albi)</label>
+                    <textarea id="adresse" class="field-textarea" rows="3" placeholder="101 Avenue Gambetta&#10;81000 Albi"></textarea>
+                    <span class="field-help">Sautez une ligne pour passer à la ligne suivante sur le site.</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Mention complémentaire (autre ville ou lieu)</label>
+                    <input type="text" id="adresse_extra" class="field-input" placeholder="+ disponibilités à Toulouse">
+                    <span class="field-help">Affiché en italique sous l'adresse. Laissez vide si vous n'exercez que dans une ville.</span>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Horaires</p>
+                <div class="field-group">
+                    <label class="field-label">Horaires d'ouverture</label>
+                    <textarea id="horaires" class="field-textarea" rows="3" placeholder="Lun – Sam : 9h – 21h&#10;Dim : 10h – 21h"></textarea>
+                    <span class="field-help">Chaque ligne correspond à une ligne sur le site.</span>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Réservation en ligne — Calendly</p>
+                <div class="field-group">
+                    <label class="field-label">Votre lien Calendly</label>
+                    <input type="url" id="calendly_url" class="field-input" placeholder="https://calendly.com/votre-identifiant">
+                    <span class="field-help">Si vous n'avez pas de Calendly, laissez vide — les boutons de réservation appelleront votre numéro.</span>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Réseaux sociaux</p>
+                <div class="field-group">
+                    <label class="field-label">Instagram (URL complète)</label>
+                    <input type="url" id="instagram" class="field-input" placeholder="https://instagram.com/ordutemps">
+                    <span class="field-help">Laissez vide pour masquer l'icône dans le footer.</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Facebook (URL complète)</label>
+                    <input type="url" id="facebook" class="field-input" placeholder="https://facebook.com/ordutemps">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">TikTok (URL complète)</label>
+                    <input type="url" id="tiktok" class="field-input" placeholder="https://tiktok.com/@ordutemps">
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">WhatsApp</p>
+                <div class="field-group">
+                    <label class="field-label">Afficher le bouton WhatsApp</label>
+                    <select id="whatsapp_enabled" class="field-input">
+                        <option value="true">Oui — afficher le bouton</option>
+                        <option value="false">Non — masquer le bouton</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Numéro WhatsApp (si différent du téléphone)</label>
+                    <input type="tel" id="whatsapp_number" class="field-input" placeholder="07 86 39 88 86">
+                    <span class="field-help">Laissez vide pour utiliser le numéro principal.</span>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Google</p>
+                <div class="field-group">
+                    <label class="field-label">Lien Google My Business</label>
+                    <input type="url" id="gmb_url" class="field-input" placeholder="https://g.page/ordutemps">
+                    <span class="field-help">Affiché dans le footer. Laissez vide si vous n'avez pas de fiche Google.</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">URL embed Google Maps</label>
+                    <input type="url" id="map_url" class="field-input" placeholder="https://www.google.com/maps/embed?pb=...">
+                    <span class="field-help">Pour changer la carte si vous changez d'adresse.</span>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Bons cadeaux — Montants proposés</p>
+                <p class="field-help" style="margin-bottom:1rem;line-height:1.65;">Ces montants s'affichent sur le site comme suggestions. Laissez vide pour n'en afficher aucun.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+                    <div class="field-group">
+                        <label class="field-label">Montant 1</label>
+                        <input type="text" id="gift_amount1" class="field-input" placeholder="50 €">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Montant 2</label>
+                        <input type="text" id="gift_amount2" class="field-input" placeholder="70 €">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Montant 3</label>
+                        <input type="text" id="gift_amount3" class="field-input" placeholder="90 €">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Note Google — Badge de confiance</p>
+                <p class="field-help" style="margin-bottom:1rem;line-height:1.65;">S'affiche près des témoignages clients. Laissez vide pour masquer.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                    <div class="field-group">
+                        <label class="field-label">Note moyenne</label>
+                        <input type="text" id="google_rating" class="field-input" placeholder="4.9">
+                        <span class="field-help">Ex : 4.9</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Nombre d'avis</label>
+                        <input type="text" id="google_review_count" class="field-input" placeholder="47">
+                        <span class="field-help">Ex : 47</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Formspree — Réception des emails</p>
+                <div class="security-info">
+                    Pour recevoir les messages du formulaire de contact, créez un compte gratuit sur <strong>formspree.io</strong> et copiez votre identifiant ici (ex: <strong>xrgbkpqd</strong>).
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Identifiant Formspree</label>
+                    <input type="text" id="formspree_id" class="field-input" placeholder="xrgbkpqd">
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ SÉCURITÉ ══ -->
+        <div id="section-securite" class="admin-section">
+            <h2 class="section-title-admin">Sécurité</h2>
+            <p class="section-desc">Gérez l'accès à cet espace administrateur et sauvegardez vos données.</p>
+
+            <div class="section-block">
+                <p class="block-title">Changer le mot de passe</p>
+                <div class="security-info">
+                    Le mot de passe par défaut est <strong>ordutemps2026</strong>. Changez-le dès que possible et notez le nouveau quelque part en cas d'oubli.
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Nouveau mot de passe</label>
+                    <input type="password" id="new-pwd" class="field-input" placeholder="Minimum 6 caractères" autocomplete="new-password">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Confirmer le nouveau mot de passe</label>
+                    <input type="password" id="confirm-pwd" class="field-input" placeholder="Répétez le mot de passe" autocomplete="new-password">
+                </div>
+                <button class="btn-action" onclick="changePassword()">Mettre à jour le mot de passe</button>
+                <p id="pwd-feedback" class="feedback-msg"></p>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Sauvegarde &amp; restauration</p>
+                <p class="field-help" style="margin-bottom:1rem;line-height:1.65;">
+                    Téléchargez une sauvegarde de toutes vos modifications (tarifs, textes, photos par URL…). Pratique si vous changez d'ordinateur ou de navigateur, ou pour sécuriser vos données.
+                </p>
+                <div class="security-actions">
+                    <button class="btn-action" onclick="exportConfig()">⬇ Télécharger ma sauvegarde</button>
+                    <label class="btn-action" style="cursor:pointer;">
+                        ⬆ Restaurer une sauvegarde
+                        <input type="file" accept=".json" onchange="importConfig(this)" style="display:none;">
+                    </label>
+                </div>
+                <p id="import-feedback" class="feedback-msg"></p>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Réinitialisation</p>
+                <p class="field-help" style="margin-bottom:1rem;line-height:1.65;">
+                    ⚠️ Remet toutes vos modifications à zéro : le site affichera à nouveau les textes, photos et tarifs d'origine. Cette action est <strong>irréversible</strong> — pensez à télécharger une sauvegarde avant.
+                </p>
+                <button class="btn-action btn-danger" onclick="resetConfig()">Tout réinitialiser</button>
+            </div>
+
+            <div class="section-block">
+                <p class="block-title">Historique des enregistrements</p>
+                <p class="field-help" style="margin-bottom:1rem;line-height:1.65;">À chaque enregistrement, une copie automatique est conservée. Vous pouvez revenir à une version précédente.</p>
+                <div id="save-history-list"></div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══ MODAL PRÉVISUALISATION ══ -->
+<div id="preview-modal" class="preview-modal" role="dialog" aria-label="Prévisualisation du site">
+    <div class="preview-toolbar">
+        <span>Prévisualisation</span>
+        <button class="btn-device active" id="btn-mobile" onclick="setPreviewDevice(375,'btn-mobile')">📱 Mobile</button>
+        <button class="btn-device" id="btn-tablet" onclick="setPreviewDevice(768,'btn-tablet')">🖥️ Tablette</button>
+        <button class="btn-device" id="btn-desktop" onclick="setPreviewDevice('100%','btn-desktop')">💻 Bureau</button>
+        <button class="btn-close-preview" onclick="closePreview()">✕ Fermer</button>
+    </div>
+    <div class="preview-frame-wrap" id="preview-frame-wrap">
+        <iframe id="preview-iframe" src="" title="Aperçu du site"></iframe>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    const CONFIG_KEY   = 'ordutemps_config';
+    const PASS_KEY     = 'ordutemps_pass';
+    const DEFAULT_PASS = 'ordutemps2026';
+
+    // ── Ctrl+S / Cmd+S pour sauvegarder ──
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            // Sauvegarder seulement si le panneau admin est visible
+            if (document.getElementById('admin-panel').classList.contains('visible')) {
+                saveConfig();
+            }
+        }
+    });
+
+    // ── Dirty state — bouton rouge si non sauvegardé ──
+    function markDirty() {
+        document.querySelectorAll('.btn-save').forEach(b => b.classList.add('dirty'));
+    }
+    function markClean() {
+        document.querySelectorAll('.btn-save').forEach(b => b.classList.remove('dirty'));
+    }
+
+    // Écoute tous les changements dans le formulaire admin
+    document.addEventListener('input', e => {
+        if (e.target.closest('#admin-panel')) markDirty();
+    });
+    document.addEventListener('change', e => {
+        if (e.target.closest('#admin-panel')) markDirty();
+    });
+
+    // ── Compteur de caractères meta description ──
+    function updateMetaCount(el) {
+        const count = el.value.length;
+        const display = document.getElementById('meta-desc-count');
+        if (!display) return;
+        display.textContent = count + ' / 160';
+        display.style.color = count > 160 ? 'var(--red)' : count > 130 ? 'var(--gold)' : 'var(--ivory-dim)';
+    }
+
+    // État des témoignages en mémoire
+    let testimonialsData = [];
+
+    // État de la FAQ en mémoire
+    let faqData = [];
+
+    // ── Valeurs par défaut ──────────────────────────────────────────
+    function getDefaults() {
+        return {
+            hero_image:    'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=2000',
+            about_image:   'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=80&w=1000',
+            emma_image:    'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&q=80&w=1000',
+            hero_eyebrow:  'Institut de Bien-être · Albi & Toulouse',
+            hero_subtitle: 'Une parenthèse hors du temps pour votre corps et votre esprit.',
+            about_text:    'Bienvenue dans mon univers de détente et de bien-être. Situé au cœur d\'Albi, je vous propose une *parenthèse hors du temps* pour vous reconnecter à votre corps.\n\nChaque massage est une invitation au voyage, mêlant techniques ancestrales et écoute attentive de vos besoins. Que vous cherchiez à soulager des tensions ou simplement à vous relaxer, je saurai adapter mes soins pour vous offrir une expérience unique et profondément ressourçante.',
+            about_quote:   'Le corps parle. Le massage l\'écoute.',
+            emma_bio:      'Passionnée par le bien-être depuis plus de 10 ans, Emma a été formée aux techniques de massage en France, en Thaïlande et en Chine. Elle met son expertise et sa sensibilité au service de chaque client.\n\nSon approche est avant tout *personnalisée et intuitive* : elle adapte chaque soin à vos tensions, votre morphologie et votre état émotionnel du jour.',
+            emma_value1:   'Formations multi-culturelles',
+            emma_value2:   'Écoute et bienveillance',
+            emma_value3:   'Soins personnalisés',
+            stat1_number:  '5+',
+            stat1_label:   'Techniques de massage',
+            stat2_number:  '2',
+            stat2_label:   'Villes — Albi & Toulouse',
+            stat3_number:  '7j/7',
+            stat3_label:   'Disponible pour vous',
+            prix_signature: '1h30 · 70 €',
+            prix_chinois:   'Sur devis',
+            prix_deep:      'Sur devis',
+            prix_suedois:   'Sur devis',
+            prix_thai:      'Sur devis',
+            prix_ado:       '1h · 50 €',
+            prix_banner:    '1h30 – 70 € | 2h – 90 €',
+            desc_signature: 'Notre création exclusive. Un voyage en plusieurs étapes mêlant effleurages doux, pressions profondes et étirements pour une relaxation absolue.',
+            desc_chinois:   'Énergétique et tonique, ce massage ancestral travaille sur les méridiens pour rééquilibrer le flux vital et libérer les blocages.',
+            desc_deep:      'Ciblant les couches profondes du tissu musculaire, ce massage libère les tensions chroniques et soulage douleurs et raideurs persistantes.',
+            desc_suedois:   'Le classique par excellence. Long effleurages glissés pour apaiser le système nerveux, améliorer la circulation et dissoudre le stress.',
+            desc_thai:      'Pratiqué sur tapis, ce massage dynamique associe pressions rythmées et étirements profonds pour retrouver souplesse et énergie vitale.',
+            desc_ado:       'Spécialement adapté aux 11–18 ans. Un moment doux pour apprendre à écouter son corps et se (re)connecter à soi-même.',
+            phone:          '07 86 39 88 86',
+            calendly_url:   '',
+            adresse:        '101 Avenue Gambetta\n81000 Albi',
+            adresse_extra:  '+ disponibilités à Toulouse',
+            horaires:       'Lun – Sam : 9h – 21h\nDim : 10h – 21h',
+            testimonials: [
+                { text: 'Une heure et demie de pure félicité. Le massage signature est absolument envoûtant — on repart transformé, le corps léger et l\'esprit apaisé.', name: 'Marie L.', city: 'Albi' },
+                { text: 'J\'avais des douleurs chroniques aux épaules depuis des mois. Après un Deep Tissue, j\'ai retrouvé une mobilité que je croyais perdue. Bluffant.', name: 'Thomas R.', city: 'Toulouse' },
+                { text: 'Un cadre chaleureux, une praticienne à l\'écoute et un moment hors du temps. J\'y emmène maintenant toute ma famille. Un vrai sanctuaire.', name: 'Sophie D.', city: 'Albi' },
+            ],
+            meta_description: 'Massages signature, chinois, deep tissue, suédois et thaï. Une parenthèse hors du temps à Albi & Toulouse avec Emma Garcia, praticienne certifiée.',
+            ga_id: '',
+            instagram: '',
+            facebook: '',
+            tiktok: '',
+            whatsapp_enabled: 'true',
+            whatsapp_number: '',
+            gmb_url: '',
+            map_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2889.664273867624!2d2.145678315502624!3d43.92134597911306!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12abc34567890abc%3A0xabcdef0123456789!2s101%20Av.%20Gambetta%2C%2081000%20Albi%2C%20France!5e0!3m2!1sfr!2sfr!4v1620000000000!5m2!1sfr!2sfr',
+            formspree_id: '',
+            gift_amount1: '50 €',
+            gift_amount2: '70 €',
+            gift_amount3: '90 €',
+            google_rating: '',
+            google_review_count: '',
+            gallery_images: [
+                { src: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=900', alt: 'Institut Or du Temps' },
+                { src: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=900', alt: 'Massage bien-être' },
+                { src: 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&q=80&w=900', alt: 'Soin relaxant' },
+                { src: 'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&q=80&w=900', alt: 'Ambiance spa' },
+                { src: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=900', alt: 'Détente et bien-être' },
+                { src: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80&w=900', alt: 'Espace soin' },
+            ],
+            faq_items: [
+                { q: 'Dois-je me déshabiller ?', a: "Le déshabillage est partiel et adapté à chaque soin. Vous gardez toujours votre intimité couverte grâce à des draps propres. Emma s'adapte à votre niveau de confort." },
+                { q: 'Comment me préparer avant ma séance ?', a: "Arrivez légèrement en avance pour vous détendre. Évitez un repas copieux dans l'heure qui précède. Signalez à Emma vos zones de tension ou toute contre-indication médicale." },
+                { q: "Combien de temps à l'avance faut-il réserver ?", a: "Idéalement 24 à 48h à l'avance. Emma essaie d'accommoder les demandes de dernière minute selon ses disponibilités — n'hésitez pas à appeler directement." },
+                { q: 'Y a-t-il des contre-indications ?', a: 'Certains soins sont déconseillés en cas de grossesse, fièvre, blessure récente ou problème cardiovasculaire. Signalez toujours votre état de santé — Emma adaptera le soin en conséquence.' },
+                { q: 'Proposez-vous des séances à domicile ?', a: 'Oui, Emma se déplace sur Albi et Toulouse sous certaines conditions. Contactez-la directement pour discuter des modalités et disponibilités.' },
+                { q: 'Quelle durée pour une première séance ?', a: "Nous recommandons 1h30 avec le massage signature. Cette durée permet à Emma de bien vous connaître et de vous offrir une expérience complète et ressourçante." },
+            ],
+        };
+    }
+
+    function getTextFields() {
+        return [
+            'hero_image','about_image','emma_image',
+            'hero_eyebrow','hero_subtitle','about_text','about_quote',
+            'emma_bio','emma_value1','emma_value2','emma_value3',
+            'stat1_number','stat1_label','stat2_number','stat2_label','stat3_number','stat3_label',
+            'prix_signature','prix_chinois','prix_deep','prix_suedois','prix_thai','prix_ado','prix_banner',
+            'desc_signature','desc_chinois','desc_deep','desc_suedois','desc_thai','desc_ado',
+            'phone','calendly_url','adresse','adresse_extra','horaires',
+            'meta_description', 'ga_id', 'instagram', 'facebook', 'tiktok', 'whatsapp_enabled', 'whatsapp_number', 'gmb_url', 'map_url', 'formspree_id',
+            'gift_amount1', 'gift_amount2', 'gift_amount3',
+            'google_rating', 'google_review_count',
+        ];
+    }
+
+    // ── Auth ────────────────────────────────────────────────────────
+    function getStoredPass() {
+        return localStorage.getItem(PASS_KEY) || DEFAULT_PASS;
+    }
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = document.getElementById('pwd-input');
+        if (input.value === getStoredPass()) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').classList.add('visible');
+            loadConfig();
+        } else {
+            input.classList.add('shake');
+            document.getElementById('login-error').classList.add('visible');
+            input.value = '';
+            setTimeout(() => input.classList.remove('shake'), 400);
+        }
+    });
+
+    function logout() {
+        if (!confirm('Se déconnecter de l\'espace admin ?')) return;
+        window.location.reload();
+    }
+
+    // ── Navigation ──────────────────────────────────────────────────
+    function showSection(name) {
+        document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('section-' + name).classList.add('active');
+        document.querySelector('[data-tab="' + name + '"]').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Chargement ──────────────────────────────────────────────────
+    function loadConfig() {
+        const saved    = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+        const defaults = getDefaults();
+
+        getTextFields().forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = (saved[id] !== undefined) ? saved[id] : defaults[id];
+        });
+
+        // Photos — aperçu
+        updatePreview('hero_image',  'preview-hero');
+        updatePreview('about_image', 'preview-about');
+        updatePreview('emma_image',  'preview-emma');
+
+        // Mise à jour du compteur meta
+        const metaEl = document.getElementById('meta_description');
+        if (metaEl) updateMetaCount(metaEl);
+
+        // Témoignages
+        const tData = saved.testimonials || defaults.testimonials;
+        testimonialsData = JSON.parse(JSON.stringify(tData));
+        renderTestimonialsList();
+
+        const savedGallery = saved.gallery_images || defaults.gallery_images;
+        renderGalleryAdmin(savedGallery);
+
+        const savedFaq = saved.faq_items || defaults.faq_items;
+        faqData = JSON.parse(JSON.stringify(savedFaq));
+        renderFaqAdmin(faqData);
+
+        renderSaveHistory();
+    }
+
+    // ── Sauvegarde ──────────────────────────────────────────────────
+    function saveConfig() {
+        const cfg = {};
+
+        getTextFields().forEach(id => {
+            const el = document.getElementById(id);
+            if (el) cfg[id] = el.value;
+        });
+
+        cfg.testimonials = testimonialsData;
+        cfg.gallery_images = getCurrentGalleryImages();
+        cfg.faq_items = JSON.parse(JSON.stringify(faqData));
+        cfg.whatsapp_enabled = document.getElementById('whatsapp_enabled')?.value !== 'false';
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+        saveToHistory(cfg);
+        markClean();
+        showToast('✓ Modifications enregistrées !');
+    }
+
+    // ── Photos ──────────────────────────────────────────────────────
+    function updatePreview(inputId, previewId) {
+        const val  = document.getElementById(inputId).value;
+        const prev = document.getElementById(previewId);
+        if (!prev) return;
+        prev.src = val || '';
+        prev.style.opacity = val ? '1' : '.2';
+    }
+
+    function handleUpload(inputId, previewId, fileInput) {
+        const file = fileInput.files[0];
+        if (!file) return;
+        if (file.size > 4 * 1024 * 1024) {
+            showToast('⚠️ Image trop grande (max 4 Mo). Compressez-la d\'abord.', true);
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById(inputId).value = e.target.result;
+            updatePreview(inputId, previewId);
+            showToast('Image chargée ! Cliquez sur Enregistrer.', false);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ── Témoignages ─────────────────────────────────────────────────
+    function escHtml(str) {
+        return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderTestimonialsList() {
+        const list = document.getElementById('testimonials-list');
+        if (!list) return;
+
+        if (!testimonialsData.length) {
+            list.innerHTML = '<p class="empty-testi">Aucun témoignage pour l\'instant. Ajoutez-en un ci-dessous.</p>';
+            return;
+        }
+
+        list.innerHTML = testimonialsData.map((t, i) => `
+            <div class="testimonial-admin-item">
+                <div class="testi-header">
+                    <span class="testi-num">Avis client #${i + 1}</span>
+                    <button class="btn-remove-testi" onclick="removeTestimonial(${i})">✕ Supprimer</button>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Ce que le client a dit</label>
+                    <textarea class="field-textarea" rows="3" placeholder="Texte du témoignage..." oninput="testimonialsData[${i}].text=this.value">${escHtml(t.text)}</textarea>
+                </div>
+                <div class="testi-row">
+                    <div class="field-group">
+                        <label class="field-label">Prénom &amp; Nom</label>
+                        <input type="text" class="field-input" placeholder="Marie L." value="${escHtml(t.name)}" oninput="testimonialsData[${i}].name=this.value">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Ville</label>
+                        <input type="text" class="field-input" placeholder="Albi" value="${escHtml(t.city)}" oninput="testimonialsData[${i}].city=this.value">
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addTestimonial() {
+        testimonialsData.push({ text: '', name: '', city: '' });
+        renderTestimonialsList();
+        const list = document.getElementById('testimonials-list');
+        list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function removeTestimonial(i) {
+        if (!confirm('Supprimer cet avis client ?')) return;
+        testimonialsData.splice(i, 1);
+        renderTestimonialsList();
+    }
+
+    // ── Mot de passe ─────────────────────────────────────────────────
+    function changePassword() {
+        const newPwd  = document.getElementById('new-pwd').value;
+        const confirm = document.getElementById('confirm-pwd').value;
+        const fb      = document.getElementById('pwd-feedback');
+
+        if (!newPwd) { fb.textContent = 'Entrez un nouveau mot de passe.'; fb.className = 'feedback-msg error'; return; }
+        if (newPwd.length < 6) { fb.textContent = 'Le mot de passe doit contenir au moins 6 caractères.'; fb.className = 'feedback-msg error'; return; }
+        if (newPwd !== confirm) { fb.textContent = 'Les deux mots de passe ne correspondent pas.'; fb.className = 'feedback-msg error'; return; }
+
+        localStorage.setItem(PASS_KEY, newPwd);
+        document.getElementById('new-pwd').value = '';
+        document.getElementById('confirm-pwd').value = '';
+        fb.textContent = '✓ Mot de passe mis à jour avec succès.';
+        fb.className   = 'feedback-msg success';
+        setTimeout(() => { fb.textContent = ''; }, 4000);
+    }
+
+    // ── Export / Import ───────────────────────────────────────────────
+    function exportConfig() {
+        const cfg  = localStorage.getItem(CONFIG_KEY) || '{}';
+        const blob = new Blob([cfg], { type: 'application/json' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = 'ordutemps-sauvegarde-' + new Date().toISOString().slice(0,10) + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Sauvegarde téléchargée !');
+    }
+
+    function importConfig(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const fb = document.getElementById('import-feedback');
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const cfg = JSON.parse(e.target.result);
+                if (!confirm('Êtes-vous sûr de vouloir restaurer cette sauvegarde ? Vos modifications actuelles seront remplacées.')) return;
+                localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+                loadConfig();
+                fb.textContent = '✓ Sauvegarde restaurée avec succès.';
+                fb.className   = 'feedback-msg success';
+                showToast('✓ Sauvegarde restaurée !');
+            } catch {
+                fb.textContent = 'Fichier invalide. Assurez-vous d\'utiliser un fichier de sauvegarde Or du Temps.';
+                fb.className   = 'feedback-msg error';
+            }
+        };
+        reader.readAsText(file);
+        input.value = '';
+    }
+
+    // ── Réinitialisation ──────────────────────────────────────────────
+    function resetConfig() {
+        if (!confirm('Remettre tout à zéro ? Cette action est irréversible.\n\nConseil : téléchargez d\'abord une sauvegarde via le bouton "Télécharger ma sauvegarde".')) return;
+        localStorage.removeItem(CONFIG_KEY);
+        loadConfig();
+        showToast('Site réinitialisé aux valeurs d\'origine.');
+    }
+
+    // ── Toast ─────────────────────────────────────────────────────────
+    function showToast(msg, isError) {
+        const toast = document.getElementById('toast');
+        toast.textContent  = msg;
+        toast.style.background = isError ? '#e05a5a' : 'var(--gold)';
+        toast.style.color      = isError ? '#fff'    : 'var(--noir)';
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 3200);
+    }
+
+    // ── Galerie admin ──────────────────────────────────────────────
+    function renderGalleryAdmin(images) {
+        const list = document.getElementById('gallery-admin-list');
+        if (!list) return;
+        list.innerHTML = images.map((img, i) => `
+            <div class="photo-editor" style="margin-bottom:1.25rem;">
+                <img class="photo-thumb" src="${escHtml(img.src)}" alt="" onerror="this.style.opacity='.2'" style="opacity:${img.src?1:.2}">
+                <div class="photo-controls">
+                    <span class="photo-label">Photo ${i+1}</span>
+                    <input type="url" class="field-input gallery-src" data-index="${i}" placeholder="https://…" value="${escHtml(img.src)}" oninput="updateGalleryPreview(${i},this)">
+                    <input type="text" class="field-input gallery-alt" data-index="${i}" placeholder="Description de la photo" value="${escHtml(img.alt)}" style="margin-top:.5rem;">
+                    <label class="upload-label" style="margin-top:.4rem;">
+                        <input type="file" accept="image/*" onchange="handleGalleryUpload(${i},this)">
+                        ＋ Depuis l'ordinateur
+                    </label>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateGalleryPreview(i, input) {
+        const thumb = input.closest('.photo-editor').querySelector('.photo-thumb');
+        if (thumb) { thumb.src = input.value; thumb.style.opacity = input.value ? '1' : '.2'; }
+    }
+
+    function handleGalleryUpload(i, fileInput) {
+        const file = fileInput.files[0];
+        if (!file) return;
+        if (file.size > 4*1024*1024) { showToast('⚠️ Image trop grande (max 4 Mo)', true); return; }
+        const reader = new FileReader();
+        reader.onload = e => {
+            const srcInput = document.querySelector(`.gallery-src[data-index="${i}"]`);
+            if (srcInput) { srcInput.value = e.target.result; updateGalleryPreview(i, srcInput); }
+            showToast('Image chargée ! Cliquez sur Enregistrer.');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function getCurrentGalleryImages() {
+        const srcs = document.querySelectorAll('.gallery-src');
+        const alts = document.querySelectorAll('.gallery-alt');
+        return Array.from(srcs).map((src, i) => ({ src: src.value.trim(), alt: (alts[i]?.value || '').trim() }));
+    }
+
+    // ── FAQ admin ──────────────────────────────────────────────────
+    function renderFaqAdmin(items) {
+        faqData = JSON.parse(JSON.stringify(items));
+        const list = document.getElementById('faq-admin-list');
+        if (!list) return;
+        if (!faqData.length) { list.innerHTML = '<p class="empty-testi">Aucune question. Ajoutez-en une ci-dessous.</p>'; return; }
+        list.innerHTML = faqData.map((item, i) => `
+            <div class="testimonial-admin-item">
+                <div class="testi-header">
+                    <span class="testi-num">Question #${i+1}</span>
+                    <button class="btn-remove-testi" onclick="removeFaqItem(${i})">✕ Supprimer</button>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">La question</label>
+                    <input type="text" class="field-input" placeholder="Votre question..." value="${escHtml(item.q)}" oninput="faqData[${i}].q=this.value">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">La réponse</label>
+                    <textarea class="field-textarea" rows="3" placeholder="Votre réponse..." oninput="faqData[${i}].a=this.value">${escHtml(item.a)}</textarea>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addFaqItem() {
+        faqData.push({ q: '', a: '' });
+        renderFaqAdmin(faqData);
+        document.getElementById('faq-admin-list').lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function removeFaqItem(i) {
+        if (!confirm('Supprimer cette question ?')) return;
+        faqData.splice(i, 1);
+        renderFaqAdmin(faqData);
+    }
+
+    // ── Historique des sauvegardes ─────────────────────────────────
+    const HISTORY_KEY = 'ordutemps_history';
+
+    function saveToHistory(cfg) {
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        history.unshift({ date: new Date().toISOString(), cfg: JSON.parse(JSON.stringify(cfg)) });
+        if (history.length > 5) history.pop();
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        renderSaveHistory();
+    }
+
+    function renderSaveHistory() {
+        const list = document.getElementById('save-history-list');
+        if (!list) return;
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        if (!history.length) {
+            list.innerHTML = '<p class="empty-testi" style="font-size:.82rem;padding:1rem 0;">Aucune sauvegarde automatique pour l\'instant.</p>';
+            return;
+        }
+        list.innerHTML = history.map((entry, i) => {
+            const d = new Date(entry.date);
+            const label = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' })
+                + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+            return `<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                <span style="font-size:.82rem;color:var(--ivory-dim);">${i===0?'<strong style="color:var(--gold);">Dernière sauvegarde</strong> — ':''}${label}</span>
+                <button class="btn-action" style="padding:.3rem .85rem;font-size:.75rem;" onclick="restoreFromHistory(${i})">Restaurer</button>
+            </div>`;
+        }).join('');
+    }
+
+    function restoreFromHistory(i) {
+        if (!confirm('Restaurer cette version ? Vos modifications actuelles seront remplacées.')) return;
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        if (!history[i]) return;
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(history[i].cfg));
+        loadConfig();
+        showToast('✓ Version restaurée !');
+    }
+
+    // ── Prévisualisation responsive ──────────────────────────────
+    function openPreview() {
+        const modal = document.getElementById('preview-modal');
+        const iframe = document.getElementById('preview-iframe');
+        if (!modal || !iframe) return;
+        iframe.src = 'index.html';
+        modal.classList.add('open');
+        setPreviewDevice(375, 'btn-mobile');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview() {
+        const modal = document.getElementById('preview-modal');
+        if (modal) modal.classList.remove('open');
+        document.getElementById('preview-iframe').src = '';
+        document.body.style.overflow = '';
+    }
+
+    function setPreviewDevice(width, activeId) {
+        const iframe = document.getElementById('preview-iframe');
+        if (iframe) iframe.style.width = typeof width === 'number' ? width + 'px' : width;
+        document.querySelectorAll('.btn-device').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.getElementById(activeId);
+        if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    // Fermer avec Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && document.getElementById('preview-modal')?.classList.contains('open')) {
+            closePreview();
+        }
+    });
+</script>
+</body>
+</html>
