@@ -1,5 +1,17 @@
+# Or du Temps — robots.txt
+# https://ordutemps.fr
+
 User-agent: *
 Allow: /
 Disallow: /emma.html
+Disallow: /404.html
 
+# Autoriser les ressources CSS/JS pour le rendu Google
+Allow: /style.css
+Allow: /script.js
+
+# Délai de courtoisie pour les crawlers
+Crawl-delay: 1
+
+# Sitemap
 Sitemap: https://ordutemps.fr/sitemap.xml

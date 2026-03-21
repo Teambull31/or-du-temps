@@ -9,6 +9,17 @@
         content="Or du Temps, votre sanctuaire de bien-être à Albi et Toulouse. Massages signature, chinois, deep tissue, suédois et thaï. Une parenthèse hors du temps.">
     <link rel="canonical" href="https://ordutemps.fr/">
 
+    <!-- SEO — robots et snippets enrichis -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="author" content="Emma Garcia — Or du Temps">
+    <meta name="keywords" content="massage Albi, massage bien-être Albi, massage relaxant Albi, massage thaï Albi, massage suédois Albi, deep tissue Albi, massage Toulouse, institut massage Albi, massage domicile Albi Toulouse, soin adolescent Albi">
+    <meta name="theme-color" content="#0A0806">
+    <!-- SEO local — Géolocalisation Albi -->
+    <meta name="geo.region" content="FR-81">
+    <meta name="geo.placename" content="Albi, Occitanie, France">
+    <meta name="geo.position" content="43.9213;2.1474">
+    <meta name="ICBM" content="43.9213, 2.1474">
+
     <!-- Favicon doré -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='18' stroke='%23C9A84C' stroke-width='2' fill='%230A0806'/%3E%3Cpath d='M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z' fill='%23C9A84C'/%3E%3Ccircle cx='20' cy='20' r='3' fill='%23C9A84C'/%3E%3C/svg%3E">
 
@@ -31,38 +42,203 @@
         rel="stylesheet">
     <!-- Calendly -->
     <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <style>
+      .skip-link{position:absolute;left:-9999px;top:1rem;padding:.5rem 1rem;background:var(--gold,#C9A84C);color:#0A0806;font-weight:600;border-radius:4px;z-index:99999;text-decoration:none;}
+      .skip-link:focus{left:1rem;}
+    </style>
     <link rel="stylesheet" href="style.css">
 
     <!-- Preload hero image -->
     <link rel="preload" as="image" href="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=2000" id="hero-preload">
 
-    <!-- Schema.org LocalBusiness -->
+    <!-- Schema.org @graph — HealthAndBeautyBusiness + FAQPage + Person + WebSite -->
     <script type="application/ld+json" id="schema-org">
     {
       "@context": "https://schema.org",
-      "@type": "HealthAndBeautyBusiness",
-      "name": "Or du Temps",
-      "description": "Institut de bien-être à Albi et Toulouse. Massages signature, chinois, deep tissue, suédois et thaï.",
-      "url": "https://ordutemps.fr",
-      "telephone": "+33786398886",
-      "priceRange": "€€",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "101 Avenue Gambetta",
-        "addressLocality": "Albi",
-        "postalCode": "81000",
-        "addressCountry": "FR"
-      },
-      "openingHoursSpecification": [
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "09:00", "closes": "21:00"},
-        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "10:00", "closes": "21:00"}
-      ],
-      "sameAs": []
+      "@graph": [
+        {
+          "@type": "HealthAndBeautyBusiness",
+          "@id": "https://ordutemps.fr/#business",
+          "name": "Or du Temps",
+          "alternateName": "Institut Or du Temps",
+          "description": "Institut de bien-être à Albi et Toulouse. Massages signature, chinois, deep tissue, suédois et thaï par Emma Garcia, praticienne certifiée.",
+          "url": "https://ordutemps.fr",
+          "image": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=1200",
+          "telephone": "+33786398886",
+          "priceRange": "€€",
+          "currenciesAccepted": "EUR",
+          "paymentAccepted": "Espèces, Carte bancaire, Virement",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "101 Avenue Gambetta",
+            "addressLocality": "Albi",
+            "postalCode": "81000",
+            "addressCountry": "FR"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 43.9213,
+            "longitude": 2.1474
+          },
+          "areaServed": [
+            {"@type": "City", "name": "Albi"},
+            {"@type": "City", "name": "Toulouse"},
+            {"@type": "AdministrativeArea", "name": "Tarn"}
+          ],
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+              "opens": "09:00",
+              "closes": "21:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Sunday"],
+              "opens": "10:00",
+              "closes": "21:00"
+            }
+          ],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Soins et Massages Or du Temps",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Massage Signature Or du Temps",
+                  "description": "Notre création exclusive — effleurages doux, pressions profondes et étirements pour une relaxation absolue à Albi."
+                },
+                "price": "70",
+                "priceCurrency": "EUR"
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Massage Chinois Albi",
+                  "description": "Massage énergétique travaillant sur les méridiens pour rééquilibrer le flux vital."
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Massage Deep Tissue Albi",
+                  "description": "Massage profond libérant les tensions chroniques et soulageant douleurs persistantes."
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Massage Suédois Albi",
+                  "description": "Effleurages glissés pour apaiser le système nerveux et dissoudre le stress."
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Massage Thaï Albi",
+                  "description": "Massage dynamique sur tapis associant pressions rythmées et étirements profonds."
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Soin Adolescent Albi",
+                  "description": "Soin doux adapté aux 11–18 ans pour apprendre à écouter son corps."
+                },
+                "price": "50",
+                "priceCurrency": "EUR"
+              }
+            ]
+          },
+          "sameAs": []
+        },
+        {
+          "@type": "Person",
+          "@id": "https://ordutemps.fr/#emma",
+          "name": "Emma Garcia",
+          "jobTitle": "Praticienne de bien-être certifiée",
+          "description": "Praticienne certifiée formée en France, Thaïlande et Chine. Experte en massage relaxant, deep tissue, thaï, suédois et chinois à Albi et Toulouse.",
+          "worksFor": {"@id": "https://ordutemps.fr/#business"},
+          "knowsAbout": ["Massage bien-être", "Massage thaï", "Deep tissue", "Massage chinois", "Massage suédois"],
+          "image": "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&q=80&w=1000"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://ordutemps.fr/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Dois-je me déshabiller pour un massage ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Le déshabillage est partiel et adapté à chaque soin. Vous gardez toujours votre intimité couverte grâce à des draps propres. Emma s'adapte à votre niveau de confort."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Comment me préparer avant ma séance de massage ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Arrivez légèrement en avance pour vous détendre. Évitez un repas copieux dans l'heure qui précède. Signalez à Emma vos zones de tension ou toute contre-indication médicale."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Combien de temps à l'avance faut-il réserver un massage à Albi ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Idéalement 24 à 48h à l'avance. Emma essaie d'accommoder les demandes de dernière minute — n'hésitez pas à appeler directement au 07 86 39 88 86."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Y a-t-il des contre-indications au massage ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Certains soins sont déconseillés en cas de grossesse, fièvre, blessure récente ou problème cardiovasculaire. Signalez toujours votre état de santé — Emma adaptera le soin en conséquence."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Proposez-vous des séances de massage à domicile à Albi et Toulouse ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Oui, Emma se déplace sur Albi et Toulouse sous certaines conditions. Contactez-la directement pour discuter des modalités et disponibilités."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quelle durée pour une première séance de massage ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Nous recommandons 1h30 avec le massage signature Or du Temps. Cette durée permet à Emma de bien vous connaître et de vous offrir une expérience complète et ressourçante."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://ordutemps.fr/#website",
+          "url": "https://ordutemps.fr",
+          "name": "Or du Temps — Massage Bien-être Albi Toulouse",
+          "inLanguage": "fr-FR",
+          "publisher": {"@id": "https://ordutemps.fr/#business"}
+        }
+      ]
     }
     </script>
 </head>
 
 <body>
+
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
 
     <!-- Barre de progression au scroll -->
     <div id="scroll-progress" class="scroll-progress" aria-hidden="true"></div>
@@ -98,13 +274,15 @@
         </div>
     </nav>
 
+    <main id="main-content">
+
     <!-- ══════════════════════════════════════
          HERO
     ══════════════════════════════════════ -->
     <section id="home" class="hero" style="padding-top: var(--nav-h);">
         <div class="hero-particles" id="hero-particles" aria-hidden="true"></div>
         <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=2000"
-            alt="" class="hero-bg-img" aria-hidden="true">
+            alt="" class="hero-bg-img" aria-hidden="true" fetchpriority="high" loading="eager">
         <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-content reveal-hero">
             <p class="hero-eyebrow">Institut de Bien-être · Albi & Toulouse</p>
@@ -151,7 +329,7 @@
                 <div class="about-visual reveal-left">
                     <div class="about-img-frame">
                         <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&q=80&w=1000"
-                            alt="La salle de soin Or du Temps — lumière chaude et cosy" class="about-img"
+                            alt="Salle de soin de massage Or du Temps à Albi — ambiance lumineuse et chaleureuse" class="about-img"
                             loading="lazy">
                         <div class="about-img-decor" aria-hidden="true"></div>
                     </div>
@@ -402,7 +580,7 @@
         <div class="emma-grid">
             <div class="emma-image-side">
                 <img src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&q=80&w=1000"
-                    alt="Emma Garcia, praticienne de bien-être, réalisant un massage relaxant" class="emma-img"
+                    alt="Emma Garcia, praticienne certifiée de massage bien-être à Albi et Toulouse" class="emma-img"
                     loading="lazy">
             </div>
             <div class="emma-text-side">
@@ -649,6 +827,8 @@
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- ══════════════════════════════════════
          FOOTER

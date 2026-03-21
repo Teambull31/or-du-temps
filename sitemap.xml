@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Page principale — priorité maximale, mise à jour fréquente -->
   <url>
     <loc>https://ordutemps.fr/</loc>
-    <lastmod>2026-03-20</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-03-21</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Mentions légales & RGPD -->
   <url>
     <loc>https://ordutemps.fr/mentions-legales.html</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-03-21</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.2</priority>
   </url>
+
 </urlset>

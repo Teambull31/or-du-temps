@@ -269,6 +269,35 @@
             if (cfg.facebook) sameAs.push(cfg.facebook);
             if (cfg.tiktok) sameAs.push(cfg.tiktok);
             if (sameAs.length) schemaData.sameAs = sameAs;
+
+            // ── FAQPage — mise à jour dynamique depuis la config ──
+            if (cfg.faq_items && cfg.faq_items.length) {
+                const graph = schemaData['@graph'] || [];
+                const faqNode = graph.find(n => n['@type'] === 'FAQPage');
+                if (faqNode) {
+                    faqNode.mainEntity = cfg.faq_items.map(item => ({
+                        '@type': 'Question',
+                        'name': item.q,
+                        'acceptedAnswer': { '@type': 'Answer', 'text': item.a }
+                    }));
+                }
+            }
+
+            // ── AggregateRating — depuis la note Google configurée ──
+            if (cfg.google_rating && cfg.google_review_count) {
+                const graph = schemaData['@graph'] || [];
+                const bizNode = graph.find(n => n['@type'] === 'HealthAndBeautyBusiness');
+                if (bizNode) {
+                    bizNode.aggregateRating = {
+                        '@type': 'AggregateRating',
+                        'ratingValue': cfg.google_rating,
+                        'reviewCount': cfg.google_review_count,
+                        'bestRating': '5',
+                        'worstRating': '1'
+                    };
+                }
+            }
+
             schemaEl.textContent = JSON.stringify(schemaData);
         } catch(e) {}
     }
