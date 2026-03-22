@@ -205,11 +205,21 @@
     // ── Galerie ──
     if (cfg.gallery_images && cfg.gallery_images.length) {
         document.querySelectorAll('.gallery-item').forEach((item, i) => {
-            if (!cfg.gallery_images[i]) return;
+            const data = cfg.gallery_images[i];
+            if (!data) return;
             const img = item.querySelector('.gallery-img');
-            if (img && cfg.gallery_images[i].src) {
-                img.src = cfg.gallery_images[i].src;
-                img.alt = cfg.gallery_images[i].alt || '';
+            if (data.type === 'youtube' && data.videoId) {
+                if (img) {
+                    img.src = 'https://img.youtube.com/vi/' + data.videoId + '/maxresdefault.jpg';
+                    img.alt = data.alt || '';
+                    img.onerror = function() { this.src = 'https://img.youtube.com/vi/' + data.videoId + '/hqdefault.jpg'; this.onerror = null; };
+                }
+                item.style.cursor = 'pointer';
+                item.onclick = function() { window.open('https://www.youtube.com/watch?v=' + data.videoId, '_blank'); };
+                const overlaySpan = item.querySelector('.gallery-overlay span');
+                if (overlaySpan) overlaySpan.textContent = '▶';
+            } else if (data.src) {
+                if (img) { img.src = data.src; img.alt = data.alt || ''; }
             }
         });
     }

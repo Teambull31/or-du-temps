@@ -1218,6 +1218,22 @@
         }));
     }
 
+    // ── YouTube helpers ────────────────────────────────────────────
+    function extractYouTubeId(url) {
+        if (!url) return null;
+        const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        return m ? m[1] : null;
+    }
+    function handleGalleryYouTube(i, url) {
+        const videoId = extractYouTubeId(url);
+        if (!videoId) { showToast('⚠️ Lien YouTube invalide', true); return; }
+        const imgs = getCurrentGalleryImages();
+        imgs[i] = { type: 'youtube', videoId, alt: imgs[i]?.alt || '' };
+        renderGalleryAdmin(imgs);
+        markDirty();
+        showToast('Vidéo YouTube ajoutée ! Cliquez sur Enregistrer.');
+    }
+
     // ── Galerie admin ──────────────────────────────────────────────
     function renderGalleryAdmin(images) {
         const list = document.getElementById('gallery-admin-list');
@@ -1226,11 +1242,13 @@
         list.textContent = '';
         images.forEach((item, i) => {
             const isVideo = item.type === 'video';
+            const isYT = item.type === 'youtube';
             const row = document.createElement('div');
             row.className = 'photo-editor';
             row.style.marginBottom = '1.25rem';
-            row.dataset.itemType = isVideo ? 'video' : 'image';
+            row.dataset.itemType = isVideo ? 'video' : (isYT ? 'youtube' : 'image');
             if (isVideo) row.dataset.videoKey = item.videoKey || '';
+            if (isYT) row.dataset.videoId = item.videoId || '';
 
             // Thumbnail
             if (isVideo) {
@@ -1244,9 +1262,14 @@
             } else {
                 const img = document.createElement('img');
                 img.className = 'photo-thumb';
-                img.src = item.src || '';
+                if (isYT && item.videoId) {
+                    img.src = 'https://img.youtube.com/vi/' + item.videoId + '/hqdefault.jpg';
+                    img.style.opacity = '1';
+                } else {
+                    img.src = item.src || '';
+                    img.style.opacity = item.src ? '1' : '.2';
+                }
                 img.alt = '';
-                img.style.opacity = item.src ? '1' : '.2';
                 img.onerror = () => { img.style.opacity = '.2'; };
                 row.appendChild(img);
             }
@@ -1257,7 +1280,7 @@
 
             const label = document.createElement('span');
             label.className = 'photo-label';
-            label.textContent = isVideo ? ('🎬 Vidéo ' + (i + 1)) : ('Photo ' + (i + 1));
+            label.textContent = isVideo ? ('🎬 Vidéo ' + (i + 1)) : (isYT ? ('▶ YouTube ' + (i + 1)) : ('Photo ' + (i + 1)));
             ctrl.appendChild(label);
 
             if (isVideo) {
@@ -1280,6 +1303,34 @@
                 delBtn.style.cssText = 'margin-top:.4rem;background:rgba(200,30,30,.12);border-color:rgba(200,30,30,.25);font-size:.8rem;padding:.4rem .8rem;';
                 delBtn.textContent = '✕ Supprimer la vidéo';
                 delBtn.onclick = () => removeGalleryVideo(i);
+                ctrl.appendChild(delBtn);
+            } else if (isYT) {
+                const urlIn = document.createElement('input');
+                urlIn.type = 'url';
+                urlIn.className = 'field-input gallery-src';
+                urlIn.dataset.index = i;
+                urlIn.placeholder = 'https://youtube.com/watch?v=…';
+                urlIn.value = item.videoId ? ('https://www.youtube.com/watch?v=' + item.videoId) : '';
+                ctrl.appendChild(urlIn);
+
+                const altIn = document.createElement('input');
+                altIn.type = 'text';
+                altIn.className = 'field-input gallery-alt';
+                altIn.placeholder = 'Description de la vidéo';
+                altIn.value = item.alt || '';
+                altIn.style.marginTop = '.5rem';
+                ctrl.appendChild(altIn);
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn-action';
+                delBtn.style.cssText = 'margin-top:.4rem;background:rgba(200,30,30,.12);border-color:rgba(200,30,30,.25);font-size:.8rem;padding:.4rem .8rem;';
+                delBtn.textContent = '✕ Supprimer la vidéo YouTube';
+                delBtn.onclick = () => {
+                    const imgs = getCurrentGalleryImages();
+                    imgs[i] = { type: 'image', src: '', alt: '' };
+                    renderGalleryAdmin(imgs);
+                    markDirty();
+                };
                 ctrl.appendChild(delBtn);
             } else {
                 const urlIn = document.createElement('input');
@@ -1320,6 +1371,26 @@
                 vidLbl.appendChild(vidFile);
                 vidLbl.appendChild(document.createTextNode(' 🎬 Vidéo depuis l\'ordinateur'));
                 ctrl.appendChild(vidLbl);
+
+                const ytSep = document.createElement('p');
+                ytSep.style.cssText = 'font-size:.75rem;color:var(--ivory-dim);margin:.6rem 0 .2rem;';
+                ytSep.textContent = 'Ou coller un lien YouTube :';
+                ctrl.appendChild(ytSep);
+
+                const ytIn = document.createElement('input');
+                ytIn.type = 'url';
+                ytIn.className = 'field-input';
+                ytIn.placeholder = 'https://youtube.com/watch?v=…';
+                ytIn.style.marginBottom = '.3rem';
+                ctrl.appendChild(ytIn);
+
+                const ytBtn = document.createElement('button');
+                ytBtn.type = 'button';
+                ytBtn.className = 'btn-action';
+                ytBtn.style.cssText = 'font-size:.8rem;padding:.4rem .9rem;color:var(--gold);';
+                ytBtn.textContent = '▶ Utiliser cette vidéo YouTube';
+                ytBtn.onclick = () => handleGalleryYouTube(i, ytIn.value);
+                ctrl.appendChild(ytBtn);
             }
 
             row.appendChild(ctrl);
@@ -1383,9 +1454,14 @@
     function getCurrentGalleryImages() {
         const editors = document.querySelectorAll('#gallery-admin-list .photo-editor');
         return Array.from(editors).map(editor => {
-            const isVideo = editor.dataset.itemType === 'video';
+            const type = editor.dataset.itemType;
             const alt = (editor.querySelector('.gallery-alt')?.value || '').trim();
-            if (isVideo) return { type: 'video', videoKey: editor.dataset.videoKey || '', alt };
+            if (type === 'video') return { type: 'video', videoKey: editor.dataset.videoKey || '', alt };
+            if (type === 'youtube') {
+                const urlVal = (editor.querySelector('.gallery-src')?.value || '').trim();
+                const videoId = extractYouTubeId(urlVal) || editor.dataset.videoId || '';
+                return { type: 'youtube', videoId, alt };
+            }
             const src = (editor.querySelector('.gallery-src')?.value || '').trim();
             return { type: 'image', src, alt };
         });
