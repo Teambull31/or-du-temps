@@ -59,13 +59,21 @@
         .logo {
             display: inline-flex;
             align-items: center;
+            gap: .6rem;
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            color: var(--gold);
             text-decoration: none;
+            letter-spacing: .04em;
             margin-bottom: 3rem;
         }
 
-        .logo img {
-            height: 72px;
-            width: auto;
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center 25%;
         }
 
         .error-number {
@@ -193,7 +201,8 @@
 
     <div class="page-wrap">
         <a href="index.html" class="logo" aria-label="Or du Temps — Retour à l'accueil">
-            <img src="assets/logo.jpeg" alt="Or du Temps">
+            <img src="assets/logo.jpeg" alt="" aria-hidden="true" class="logo-img">
+            Or du Temps
         </a>
 
         <p class="error-eyebrow">Erreur</p>
