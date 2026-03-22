@@ -219,11 +219,18 @@
                 const overlaySpan = item.querySelector('.gallery-overlay span');
                 if (overlaySpan) overlaySpan.textContent = '▶';
             } else if (data.type === 'gdrive' && data.fileId) {
-                if (img) {
-                    img.src = 'https://drive.google.com/thumbnail?id=' + data.fileId + '&sz=w800';
-                    img.alt = data.alt || '';
-                    img.onerror = function() { this.style.opacity = '.3'; this.onerror = null; };
-                }
+                if (img) img.style.display = 'none';
+                const ph = document.createElement('div');
+                ph.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--noir-3,#1A1310);gap:.4rem;';
+                const phIcon = document.createElement('span');
+                phIcon.style.cssText = 'font-size:2.2rem;color:#D4A843;opacity:.75;';
+                phIcon.textContent = '▶';
+                const phLabel = document.createElement('span');
+                phLabel.style.cssText = 'font-size:.65rem;letter-spacing:.14em;color:#C8BAA0;opacity:.45;font-family:sans-serif;';
+                phLabel.textContent = 'GOOGLE DRIVE';
+                ph.appendChild(phIcon);
+                ph.appendChild(phLabel);
+                item.insertBefore(ph, item.querySelector('.gallery-overlay'));
                 item.style.cursor = 'pointer';
                 item.onclick = function() { window.open('https://drive.google.com/file/d/' + data.fileId + '/view', '_blank'); };
                 const overlaySpanGD = item.querySelector('.gallery-overlay span');

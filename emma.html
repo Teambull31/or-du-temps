@@ -1279,14 +1279,17 @@
                 vid.setAttribute('playsinline', '');
                 vid.style.cssText = 'background:#111;object-fit:cover;opacity:.9;';
                 row.appendChild(vid);
+            } else if (isGD) {
+                const gdPh = document.createElement('div');
+                gdPh.className = 'photo-thumb';
+                gdPh.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1A1310;gap:.2rem;border-radius:4px;';
+                gdPh.innerHTML = '<span style="font-size:1.4rem;color:#D4A843;opacity:.7;">▶</span><span style="font-size:.6rem;color:#C8BAA0;opacity:.4;letter-spacing:.1em;">DRIVE</span>';
+                row.appendChild(gdPh);
             } else {
                 const img = document.createElement('img');
                 img.className = 'photo-thumb';
                 if (isYT && item.videoId) {
                     img.src = 'https://img.youtube.com/vi/' + item.videoId + '/hqdefault.jpg';
-                    img.style.opacity = '1';
-                } else if (isGD && item.fileId) {
-                    img.src = 'https://drive.google.com/thumbnail?id=' + item.fileId + '&sz=w400';
                     img.style.opacity = '1';
                 } else {
                     img.src = item.src || '';
