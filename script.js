@@ -326,6 +326,51 @@
 })();
 
 /* ══════════════════════════════════
+   0a-video. GALERIE VIDÉOS — chargement async depuis IndexedDB
+══════════════════════════════════ */
+(async function applyVideoGallery() {
+    const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+    if (!cfg.gallery_images) return;
+
+    function openVDB() {
+        return new Promise((res, rej) => {
+            const r = indexedDB.open('ordutemps_videos', 1);
+            r.onupgradeneeded = e => e.target.result.createObjectStore('videos');
+            r.onsuccess = e => res(e.target.result);
+            r.onerror = () => rej(r.error);
+        });
+    }
+
+    for (let i = 0; i < cfg.gallery_images.length; i++) {
+        const item = cfg.gallery_images[i];
+        if (item.type !== 'video' || !item.videoKey) continue;
+        const galleryItem = document.querySelector('.gallery-item[data-index="' + i + '"]');
+        if (!galleryItem) continue;
+        try {
+            const db = await openVDB();
+            const blob = await new Promise((res, rej) => {
+                const tx = db.transaction('videos', 'readonly');
+                const r = tx.objectStore('videos').get(item.videoKey);
+                r.onsuccess = () => res(r.result);
+                r.onerror = () => rej(r.error);
+            });
+            if (!blob) continue;
+            const url = URL.createObjectURL(blob);
+            const img = galleryItem.querySelector('.gallery-img');
+            if (img) img.style.display = 'none';
+            const video = document.createElement('video');
+            video.className = 'gallery-video';
+            video.autoplay = true;
+            video.muted = true;
+            video.loop = true;
+            video.setAttribute('playsinline', '');
+            video.src = url;
+            galleryItem.insertBefore(video, galleryItem.querySelector('.gallery-overlay'));
+        } catch(e) {}
+    }
+})();
+
+/* ══════════════════════════════════
    0b. CALENDLY — fallback même sans config
    (applyConfig retourne tôt si pas de config,
    ce bloc s'assure que les boutons fonctionnent)

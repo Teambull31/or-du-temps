@@ -1478,14 +1478,15 @@ svg {
     overflow: hidden;
     cursor: pointer;
 }
-.gallery-img {
+.gallery-img, .gallery-video {
     width: 100%; height: 100%;
     object-fit: cover;
     filter: saturate(.8) brightness(.88);
     transition: transform .7s cubic-bezier(0.16,1,.3,1), filter .7s;
     display: block;
 }
-.gallery-item:hover .gallery-img {
+.gallery-item:hover .gallery-img,
+.gallery-item:hover .gallery-video {
     transform: scale(1.06);
     filter: saturate(1) brightness(.95);
 }

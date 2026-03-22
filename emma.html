@@ -1186,24 +1186,155 @@
         setTimeout(() => toast.classList.remove('visible'), 3200);
     }
 
+    // ── IndexedDB — stockage vidéos ────────────────────────────────
+    const _VDB = 'ordutemps_videos', _VS = 'videos';
+    function _openVDB() {
+        return new Promise((res, rej) => {
+            const r = indexedDB.open(_VDB, 1);
+            r.onupgradeneeded = e => e.target.result.createObjectStore(_VS);
+            r.onsuccess = e => res(e.target.result);
+            r.onerror = () => rej(r.error);
+        });
+    }
+    function storeVideoDB(key, blob) {
+        return _openVDB().then(db => new Promise((res, rej) => {
+            const tx = db.transaction(_VS, 'readwrite');
+            tx.objectStore(_VS).put(blob, key);
+            tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+        }));
+    }
+    function getVideoDB(key) {
+        return _openVDB().then(db => new Promise((res, rej) => {
+            const tx = db.transaction(_VS, 'readonly');
+            const r = tx.objectStore(_VS).get(key);
+            r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+        }));
+    }
+    function deleteVideoDB(key) {
+        return _openVDB().then(db => new Promise((res, rej) => {
+            const tx = db.transaction(_VS, 'readwrite');
+            tx.objectStore(_VS).delete(key);
+            tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+        }));
+    }
+
     // ── Galerie admin ──────────────────────────────────────────────
     function renderGalleryAdmin(images) {
         const list = document.getElementById('gallery-admin-list');
         if (!list) return;
-        list.innerHTML = images.map((img, i) => `
-            <div class="photo-editor" style="margin-bottom:1.25rem;">
-                <img class="photo-thumb" src="${escHtml(img.src)}" alt="" onerror="this.style.opacity='.2'" style="opacity:${img.src?1:.2}">
-                <div class="photo-controls">
-                    <span class="photo-label">Photo ${i+1}</span>
-                    <input type="url" class="field-input gallery-src" data-index="${i}" placeholder="https://…" value="${escHtml(img.src)}" oninput="updateGalleryPreview(${i},this)">
-                    <input type="text" class="field-input gallery-alt" data-index="${i}" placeholder="Description de la photo" value="${escHtml(img.alt)}" style="margin-top:.5rem;">
-                    <label class="upload-label" style="margin-top:.4rem;">
-                        <input type="file" accept="image/*" onchange="handleGalleryUpload(${i},this)">
-                        ＋ Depuis l'ordinateur
-                    </label>
-                </div>
-            </div>
-        `).join('');
+        // Build rows using DOM to avoid innerHTML with dynamic data
+        list.textContent = '';
+        images.forEach((item, i) => {
+            const isVideo = item.type === 'video';
+            const row = document.createElement('div');
+            row.className = 'photo-editor';
+            row.style.marginBottom = '1.25rem';
+            row.dataset.itemType = isVideo ? 'video' : 'image';
+            if (isVideo) row.dataset.videoKey = item.videoKey || '';
+
+            // Thumbnail
+            if (isVideo) {
+                const vid = document.createElement('video');
+                vid.className = 'photo-thumb';
+                vid.dataset.vpreview = i;
+                vid.muted = true;
+                vid.setAttribute('playsinline', '');
+                vid.style.cssText = 'background:#111;object-fit:cover;opacity:.9;';
+                row.appendChild(vid);
+            } else {
+                const img = document.createElement('img');
+                img.className = 'photo-thumb';
+                img.src = item.src || '';
+                img.alt = '';
+                img.style.opacity = item.src ? '1' : '.2';
+                img.onerror = () => { img.style.opacity = '.2'; };
+                row.appendChild(img);
+            }
+
+            // Controls
+            const ctrl = document.createElement('div');
+            ctrl.className = 'photo-controls';
+
+            const label = document.createElement('span');
+            label.className = 'photo-label';
+            label.textContent = isVideo ? ('🎬 Vidéo ' + (i + 1)) : ('Photo ' + (i + 1));
+            ctrl.appendChild(label);
+
+            if (isVideo) {
+                const ok = document.createElement('span');
+                ok.className = 'photo-help';
+                ok.style.color = 'var(--gold)';
+                ok.textContent = 'Vidéo chargée ✓';
+                ctrl.appendChild(ok);
+
+                const altIn = document.createElement('input');
+                altIn.type = 'text';
+                altIn.className = 'field-input gallery-alt';
+                altIn.placeholder = 'Description de la vidéo';
+                altIn.value = item.alt || '';
+                altIn.style.marginTop = '.5rem';
+                ctrl.appendChild(altIn);
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn-action';
+                delBtn.style.cssText = 'margin-top:.4rem;background:rgba(200,30,30,.12);border-color:rgba(200,30,30,.25);font-size:.8rem;padding:.4rem .8rem;';
+                delBtn.textContent = '✕ Supprimer la vidéo';
+                delBtn.onclick = () => removeGalleryVideo(i);
+                ctrl.appendChild(delBtn);
+            } else {
+                const urlIn = document.createElement('input');
+                urlIn.type = 'url';
+                urlIn.className = 'field-input gallery-src';
+                urlIn.dataset.index = i;
+                urlIn.placeholder = 'https://…';
+                urlIn.value = item.src || '';
+                urlIn.oninput = () => updateGalleryPreview(i, urlIn);
+                ctrl.appendChild(urlIn);
+
+                const altIn = document.createElement('input');
+                altIn.type = 'text';
+                altIn.className = 'field-input gallery-alt';
+                altIn.placeholder = 'Description de la photo';
+                altIn.value = item.alt || '';
+                altIn.style.marginTop = '.5rem';
+                ctrl.appendChild(altIn);
+
+                const imgLbl = document.createElement('label');
+                imgLbl.className = 'upload-label';
+                imgLbl.style.marginTop = '.4rem';
+                const imgFile = document.createElement('input');
+                imgFile.type = 'file';
+                imgFile.accept = 'image/*';
+                imgFile.onchange = () => handleGalleryUpload(i, imgFile);
+                imgLbl.appendChild(imgFile);
+                imgLbl.appendChild(document.createTextNode(' ＋ Photo depuis l\'ordinateur'));
+                ctrl.appendChild(imgLbl);
+
+                const vidLbl = document.createElement('label');
+                vidLbl.className = 'upload-label';
+                vidLbl.style.marginTop = '.4rem';
+                const vidFile = document.createElement('input');
+                vidFile.type = 'file';
+                vidFile.accept = 'video/mp4,video/webm,video/quicktime';
+                vidFile.onchange = () => handleGalleryVideoUpload(i, vidFile);
+                vidLbl.appendChild(vidFile);
+                vidLbl.appendChild(document.createTextNode(' 🎬 Vidéo depuis l\'ordinateur'));
+                ctrl.appendChild(vidLbl);
+            }
+
+            row.appendChild(ctrl);
+            list.appendChild(row);
+        });
+
+        // Charger les aperçus vidéo
+        images.forEach((item, i) => {
+            if (item.type !== 'video' || !item.videoKey) return;
+            getVideoDB(item.videoKey).then(blob => {
+                if (!blob) return;
+                const v = list.querySelector('video[data-vpreview="' + i + '"]');
+                if (v) v.src = URL.createObjectURL(blob);
+            }).catch(() => {});
+        });
     }
 
     function updateGalleryPreview(i, input) {
@@ -1224,10 +1355,40 @@
         reader.readAsDataURL(file);
     }
 
+    function handleGalleryVideoUpload(i, fileInput) {
+        const file = fileInput.files[0];
+        if (!file) return;
+        if (file.size > 50 * 1024 * 1024) { showToast('⚠️ Vidéo trop grande (max 50 Mo)', true); return; }
+        const key = 'gallery_video_' + i + '_' + Date.now();
+        storeVideoDB(key, file).then(() => {
+            const imgs = getCurrentGalleryImages();
+            imgs[i] = { type: 'video', videoKey: key, alt: imgs[i]?.alt || '' };
+            renderGalleryAdmin(imgs);
+            markDirty();
+            showToast('Vidéo chargée ! Cliquez sur Enregistrer.');
+        }).catch(() => showToast('⚠️ Erreur lors du chargement', true));
+    }
+
+    function removeGalleryVideo(i) {
+        if (!confirm('Supprimer cette vidéo et revenir à une photo ?')) return;
+        const editors = document.querySelectorAll('#gallery-admin-list .photo-editor');
+        const videoKey = editors[i]?.dataset.videoKey;
+        if (videoKey) deleteVideoDB(videoKey).catch(() => {});
+        const imgs = getCurrentGalleryImages();
+        imgs[i] = { type: 'image', src: '', alt: '' };
+        renderGalleryAdmin(imgs);
+        markDirty();
+    }
+
     function getCurrentGalleryImages() {
-        const srcs = document.querySelectorAll('.gallery-src');
-        const alts = document.querySelectorAll('.gallery-alt');
-        return Array.from(srcs).map((src, i) => ({ src: src.value.trim(), alt: (alts[i]?.value || '').trim() }));
+        const editors = document.querySelectorAll('#gallery-admin-list .photo-editor');
+        return Array.from(editors).map(editor => {
+            const isVideo = editor.dataset.itemType === 'video';
+            const alt = (editor.querySelector('.gallery-alt')?.value || '').trim();
+            if (isVideo) return { type: 'video', videoKey: editor.dataset.videoKey || '', alt };
+            const src = (editor.querySelector('.gallery-src')?.value || '').trim();
+            return { type: 'image', src, alt };
+        });
     }
 
     // ── FAQ admin ──────────────────────────────────────────────────
