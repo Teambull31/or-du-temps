@@ -218,6 +218,16 @@
                 item.onclick = function() { window.open('https://www.youtube.com/watch?v=' + data.videoId, '_blank'); };
                 const overlaySpan = item.querySelector('.gallery-overlay span');
                 if (overlaySpan) overlaySpan.textContent = '▶';
+            } else if (data.type === 'gdrive' && data.fileId) {
+                if (img) {
+                    img.src = 'https://drive.google.com/thumbnail?id=' + data.fileId + '&sz=w800';
+                    img.alt = data.alt || '';
+                    img.onerror = function() { this.style.opacity = '.3'; this.onerror = null; };
+                }
+                item.style.cursor = 'pointer';
+                item.onclick = function() { window.open('https://drive.google.com/file/d/' + data.fileId + '/view', '_blank'); };
+                const overlaySpanGD = item.querySelector('.gallery-overlay span');
+                if (overlaySpanGD) overlaySpanGD.textContent = '▶';
             } else if (data.src) {
                 if (img) { img.src = data.src; img.alt = data.alt || ''; }
             }
