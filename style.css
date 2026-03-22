@@ -1633,7 +1633,7 @@ svg {
    WHATSAPP BUTTON
 ══════════════════════════════════════════ */
 .instagram-fab {
-    position: fixed; bottom: 5.5rem; right: 2rem; z-index: 800;
+    position: fixed; bottom: 6.5rem; right: 2rem; z-index: 800;
     width: 56px; height: 56px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; color: #fff;
     background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
@@ -1722,7 +1722,7 @@ svg {
     .gallery-grid { grid-template-columns: repeat(2,1fr); }
     .lightbox-prev { left: .5rem; }
     .lightbox-next { right: .5rem; }
-    .instagram-fab { bottom: 4.75rem; right: 1.25rem; }
+    .instagram-fab { bottom: 5.75rem; right: 1.25rem; }
     .whatsapp-fab { bottom: 1.25rem; right: 1.25rem; }
     .back-to-top { bottom: 1.25rem; left: 1.25rem; }
 }
