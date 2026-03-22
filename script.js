@@ -218,6 +218,16 @@
                 item.onclick = function() { window.open('https://www.youtube.com/watch?v=' + data.videoId, '_blank'); };
                 const overlaySpan = item.querySelector('.gallery-overlay span');
                 if (overlaySpan) overlaySpan.textContent = '▶';
+            } else if (data.type === 'video-url' && data.src) {
+                if (img) img.style.display = 'none';
+                const video = document.createElement('video');
+                video.className = 'gallery-video';
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = true;
+                video.setAttribute('playsinline', '');
+                video.src = data.src;
+                item.insertBefore(video, item.querySelector('.gallery-overlay'));
             } else if (data.type === 'gdrive' && data.fileId) {
                 if (img) img.style.display = 'none';
                 const ph = document.createElement('div');
