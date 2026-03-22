@@ -91,6 +91,10 @@
     if (cfg.phone) {
         const tel = cfg.phone.replace(/\s/g, '');
         document.querySelectorAll('a[href^="tel:"]').forEach(a => { a.href = 'tel:' + tel; });
+        document.querySelectorAll('a[href^="sms:"]').forEach(a => {
+            const body = a.href.includes('?body=') ? a.href.split('?body=')[1] : '';
+            a.href = 'sms:' + tel + (body ? '?body=' + body : '');
+        });
         const visiblePhone = document.querySelector('#contact-telephone a');
         if (visiblePhone) visiblePhone.textContent = cfg.phone;
     }
