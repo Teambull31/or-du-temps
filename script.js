@@ -223,14 +223,26 @@
             } else if (data.type === 'video-url' && data.src) {
                 item.dataset.noLightbox = 'true';
                 if (img) img.style.display = 'none';
+                if (item.querySelector('.gallery-video')) return; // évite les doublons
                 const video = document.createElement('video');
                 video.className = 'gallery-video';
-                video.autoplay = true;
                 video.muted = true;
                 video.loop = true;
+                video.setAttribute('autoplay', '');
                 video.setAttribute('playsinline', '');
+                video.setAttribute('preload', 'auto');
                 video.src = data.src;
                 item.insertBefore(video, item.querySelector('.gallery-overlay'));
+                // Lecture explicite — l'attribut autoplay seul peut être ignoré au refresh
+                const tryPlay = () => video.play().catch(() => {});
+                video.addEventListener('canplay', tryPlay, { once: true });
+                // Fallback via IntersectionObserver si canplay ne se déclenche pas
+                if ('IntersectionObserver' in window) {
+                    const obs = new IntersectionObserver(entries => {
+                        if (entries[0].isIntersecting) { tryPlay(); obs.disconnect(); }
+                    }, { threshold: 0.1 });
+                    obs.observe(item);
+                }
             } else if (data.type === 'gdrive' && data.fileId) {
                 if (img) img.style.display = 'none';
                 const ph = document.createElement('div');
