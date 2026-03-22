@@ -1571,7 +1571,7 @@ svg {
     background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,168,67,.08) 0%, transparent 70%);
     pointer-events: none;
 }
-.gift-card-logo { width: 140px; height: auto; border-radius: 10px; display: block; }
+.gift-card-logo { width: 140px; height: 105px; object-fit: cover; object-position: center top; border-radius: 10px; display: block; }
 .gift-card-label {
     font-size: .62rem; letter-spacing: .25em; text-transform: uppercase;
     color: var(--ivory-dim); border: 1px solid var(--glass-border);
