@@ -204,11 +204,20 @@ svg {
 .nav-logo {
     display: flex;
     align-items: center;
+    gap: .65rem;
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: .04em;
 }
 
-.nav-logo img {
-    height: 52px;
-    width: auto;
+.nav-logo-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 35%;
 }
 
 .nav-links {
