@@ -13,7 +13,8 @@
    sont appliquées ici automatiquement au chargement.
 ══════════════════════════════════ */
 (function applyConfig() {
-    const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+    const _saved = localStorage.getItem('ordutemps_config');
+    const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
     if (!Object.keys(cfg).length) return;
 
     // ── Helpers ──
@@ -370,7 +371,8 @@
    0a-video. GALERIE VIDÉOS — chargement async depuis IndexedDB
 ══════════════════════════════════ */
 (async function applyVideoGallery() {
-    const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+    const _saved = localStorage.getItem('ordutemps_config');
+    const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
     if (!cfg.gallery_images) return;
 
     function openVDB() {
@@ -417,7 +419,8 @@
    ce bloc s'assure que les boutons fonctionnent)
 ══════════════════════════════════ */
 (function() {
-    const cfg = JSON.parse(localStorage.getItem('ordutemps_config') || '{}');
+    const _saved = localStorage.getItem('ordutemps_config');
+    const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
     // Si calendly_url est configuré, applyConfig() a déjà mis à jour les onclick
     if (cfg.calendly_url) return;
     // Pas de Calendly → redirige vers le numéro de téléphone

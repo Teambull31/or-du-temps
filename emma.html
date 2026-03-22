@@ -331,6 +331,7 @@
             <a href="index.html" target="_blank" class="link-preview">Voir le site ↗</a>
             <button class="btn-logout" onclick="logout()">Déconnexion</button>
             <button class="btn-save" onclick="saveConfig()">Enregistrer</button>
+            <button class="btn-save" onclick="publishConfig()" style="background:var(--noir-3);color:var(--gold);border:1px solid var(--gold);margin-left:.2rem;" title="Rend les modifications visibles sur tous les appareils">📤 Publier</button>
         </div>
     </header>
 
@@ -968,6 +969,21 @@
             setTimeout(() => input.classList.remove('shake'), 400);
         }
     });
+
+    function publishConfig() {
+        const raw = localStorage.getItem('ordutemps_config');
+        if (!raw) { showToast('⚠️ Enregistrez d\'abord vos modifications.', true); return; }
+        const date = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const content = '// Configuration Or du Temps — publiée le ' + date + '\n' +
+            '// Committez ce fichier dans git pour que tous les appareils voient le même site.\n' +
+            'window.__ODT_DEFAULT_CONFIG__ = ' + raw + ';\n';
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([content], { type: 'application/javascript' }));
+        a.download = 'config.js';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showToast('config.js téléchargé ! Committez-le dans git pour publier.');
+    }
 
     function logout() {
         if (!confirm('Se déconnecter de l\'espace admin ?')) return;
