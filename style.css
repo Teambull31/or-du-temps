@@ -1307,3 +1307,368 @@ svg {
         font-size: 3.5rem;
     }
 }
+
+/* ══════════════════════════════════════════
+   SCROLL PROGRESS BAR
+══════════════════════════════════════════ */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(to right, var(--gold-dark), var(--gold), var(--gold-light));
+    z-index: 9999;
+    transition: width .1s linear;
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   CURSEUR CUSTOM (desktop)
+══════════════════════════════════════════ */
+@media (hover: hover) and (pointer: fine) {
+    body {
+        cursor: none;
+    }
+
+    a, button, [role="button"], .service-card, label {
+        cursor: none;
+    }
+
+    .custom-cursor {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--gold);
+        pointer-events: none;
+        z-index: 99999;
+        transform: translate(-50%, -50%);
+        transition: transform .15s var(--ease-out), opacity .2s, width .25s var(--ease-out), height .25s var(--ease-out), background .2s;
+        mix-blend-mode: difference;
+    }
+
+    .custom-cursor.hovering {
+        width: 36px;
+        height: 36px;
+        background: rgba(212, 168, 67, .25);
+        border: 1px solid var(--gold);
+    }
+
+    .custom-cursor.clicking {
+        transform: translate(-50%, -50%) scale(.7);
+    }
+}
+
+/* ══════════════════════════════════════════
+   BACK TO TOP
+══════════════════════════════════════════ */
+.back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--noir-3);
+    border: 1px solid var(--glass-border);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 500;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .4s var(--ease-out), transform .4s var(--ease-out), background .3s, border-color .3s;
+    pointer-events: none;
+    backdrop-filter: blur(12px);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.back-to-top:hover {
+    background: var(--gold);
+    color: var(--noir);
+    border-color: var(--gold);
+}
+
+/* ══════════════════════════════════════════
+   SERVICE CARD — BADGE BEST-SELLER
+══════════════════════════════════════════ */
+.service-card--featured {
+    background: linear-gradient(135deg, var(--noir-3) 0%, rgba(30, 22, 12, 1) 100%);
+    border-top: 2px solid var(--gold);
+    position: relative;
+}
+
+.card-badge {
+    position: absolute;
+    top: -1px;
+    right: 1.5rem;
+    background: var(--gold);
+    color: var(--noir);
+    font-size: .65rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: .3rem .8rem;
+    border-radius: 0 0 6px 6px;
+}
+
+/* ══════════════════════════════════════════
+   WHATSAPP BUTTON
+══════════════════════════════════════════ */
+.contact-cta-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    padding: 1.1rem;
+    background: transparent;
+    color: #25D366;
+    border: 1px solid #25D366;
+    font-weight: 500;
+    font-size: .92rem;
+    letter-spacing: .07em;
+    border-radius: 4px;
+    transition: background .3s, color .3s, transform .3s, box-shadow .3s;
+}
+
+.contact-cta-whatsapp:hover {
+    background: #25D366;
+    color: var(--noir);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(37, 211, 102, .2);
+}
+
+/* ══════════════════════════════════════════
+   BON CADEAU BANNER
+══════════════════════════════════════════ */
+.gift-banner {
+    background: var(--noir-3);
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 2.5rem 0;
+}
+
+.gift-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: left;
+}
+
+.gift-icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    background: rgba(201, 168, 76, .1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gift-text {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+}
+
+.gift-text strong {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--ivory);
+}
+
+.gift-text span {
+    font-size: .85rem;
+    color: var(--ivory-dim);
+}
+
+.gift-cta {
+    margin-left: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .gift-cta {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* ══════════════════════════════════════════
+   FAQ
+══════════════════════════════════════════ */
+.faq-section {
+    background: var(--noir);
+}
+
+.faq-list {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.faq-item {
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: var(--noir-3);
+    border: none;
+    color: var(--ivory);
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 400;
+    text-align: left;
+    cursor: pointer;
+    transition: background .3s, color .3s;
+    line-height: 1.4;
+    min-height: 44px;
+}
+
+.faq-question:hover {
+    background: var(--noir-4);
+    color: var(--gold);
+}
+
+.faq-question[aria-expanded="true"] {
+    background: var(--noir-4);
+    color: var(--gold);
+}
+
+.faq-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+}
+
+.faq-icon::before,
+.faq-icon::after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform .35s var(--ease-out), opacity .35s;
+}
+
+.faq-icon::before {
+    width: 14px;
+    height: 1.5px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.faq-icon::after {
+    width: 1.5px;
+    height: 14px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.faq-question[aria-expanded="true"] .faq-icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+    opacity: 0;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .45s var(--ease-out);
+    background: var(--noir-2);
+}
+
+.faq-answer p {
+    padding: 1.25rem 2rem 1.75rem;
+    font-size: .95rem;
+    color: var(--ivory-dim);
+    line-height: 1.8;
+}
+
+.faq-answer p strong {
+    color: var(--ivory);
+}
+
+.faq-answer.open {
+    max-height: 400px;
+}
+
+/* ══════════════════════════════════════════
+   MOBILE TOUCH TARGETS — min 44px
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .card-cta {
+        padding: .5rem 0;
+        min-height: 44px;
+        align-items: center;
+    }
+
+    .t-dot {
+        height: 8px;
+        min-width: 28px;
+    }
+
+    .back-to-top {
+        bottom: 1.25rem;
+        right: 1.25rem;
+    }
+}
+
+/* ══════════════════════════════════════════
+   SERVICES — Swipe hint mobile
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .services-grid {
+        overflow-x: auto;
+        display: flex;
+        flex-direction: column;
+        scroll-snap-type: y mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .service-card {
+        scroll-snap-align: start;
+    }
+}
+
+/* ══════════════════════════════════════════
+   NAV ACTIVE LINK
+══════════════════════════════════════════ */
+.nav-link.active {
+    color: var(--gold);
+}
+
+.nav-link.active::after {
+    width: 100%;
+}

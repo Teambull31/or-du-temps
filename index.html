@@ -7,6 +7,58 @@
     <title>Or du Temps — Massage Bien-être à Albi & Toulouse</title>
     <meta name="description"
         content="Or du Temps, votre sanctuaire de bien-être à Albi et Toulouse. Massages signature, chinois, deep tissue, suédois et thaï. Une parenthèse hors du temps.">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Or du Temps — Massage Bien-être à Albi & Toulouse">
+    <meta property="og:description" content="Votre sanctuaire de bien-être. Massages signature, chinois, deep tissue, suédois et thaï par Emma Garcia. Disponible 7j/7 à Albi & Toulouse.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=1200">
+    <meta property="og:locale" content="fr_FR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Or du Temps — Massage Bien-être à Albi & Toulouse">
+    <meta name="twitter:description" content="Votre sanctuaire de bien-être. Massages premium par Emma Garcia. Albi & Toulouse, 7j/7.">
+
+    <!-- Schema.org LocalBusiness -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HealthAndBeautyBusiness",
+      "name": "Or du Temps",
+      "description": "Institut de massage bien-être à Albi et Toulouse. Massages signature, chinois, deep tissue, suédois, thaï et soin adolescent.",
+      "url": "https://ordutemps.fr",
+      "telephone": "+33786398886",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "101 Avenue Gambetta",
+        "addressLocality": "Albi",
+        "postalCode": "81000",
+        "addressCountry": "FR"
+      },
+      "openingHours": ["Mo-Sa 09:00-21:00", "Su 10:00-21:00"],
+      "priceRange": "€€",
+      "image": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=1200",
+      "sameAs": [],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Soins & Massages",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": { "@type": "Service", "name": "Massage Signature" },
+            "price": "70",
+            "priceCurrency": "EUR"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": { "@type": "Service", "name": "Soin Adolescent" },
+            "price": "50",
+            "priceCurrency": "EUR"
+          }
+        ]
+      }
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -16,6 +68,9 @@
 </head>
 
 <body>
+
+    <!-- Barre de progression de scroll -->
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
 
     <!-- ══════════════════════════════════════
          NAVIGATION
@@ -143,7 +198,8 @@
             </div>
             <div class="services-grid">
                 <!-- Massage Signature -->
-                <article class="service-card reveal" id="soin-signature">
+                <article class="service-card service-card--featured reveal" id="soin-signature">
+                    <div class="card-badge">Coup de cœur</div>
                     <div class="card-icon" aria-hidden="true">
                         <svg viewBox="0 0 48 48" fill="none">
                             <path d="M24 6C15 6 9 14 9 22C9 32 16 38 24 42C32 38 39 32 39 22C39 14 33 6 24 6Z"
@@ -416,6 +472,13 @@
                         </svg>
                         Appeler pour prendre RDV
                     </a>
+                    <a href="https://wa.me/33786398886?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous%20chez%20Or%20du%20Temps." class="contact-cta-whatsapp reveal" target="_blank" rel="noopener" aria-label="Contacter via WhatsApp" id="contact-whatsapp">
+                        <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="currentColor"/>
+                            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.087.535 4.049 1.474 5.757L0 24l6.412-1.451A11.946 11.946 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.003-1.368l-.358-.213-3.712.84.878-3.606-.234-.371A9.818 9.818 0 1 1 12 21.818z" fill="currentColor"/>
+                        </svg>
+                        WhatsApp
+                    </a>
                 </div>
                 <div class="contact-map-wrapper reveal" id="contact-map">
                     <iframe
@@ -423,6 +486,85 @@
                         title="Or du Temps — 101 Avenue Gambetta, Albi" width="100%" height="100%" style="border:0;"
                         allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         BON CADEAU
+    ══════════════════════════════════════ -->
+    <div class="gift-banner">
+        <div class="container">
+            <div class="gift-banner-inner reveal">
+                <div class="gift-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" width="28" height="28">
+                        <path d="M20 12v10H4V12M22 7H2v5h20V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="gift-text">
+                    <strong>Offrir une parenthèse de bien-être</strong>
+                    <span>Bons cadeaux disponibles — parfaits pour toutes les occasions</span>
+                </div>
+                <a href="tel:0786398886" class="btn btn-outline gift-cta">Renseignements →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         FAQ
+    ══════════════════════════════════════ -->
+    <section id="faq" class="section faq-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <p class="section-eyebrow">Questions fréquentes</p>
+                <h2 class="section-title">Vous avez des <em>questions ?</em></h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item reveal">
+                    <button class="faq-question" aria-expanded="false">
+                        Comment se déroule une séance ?
+                        <span class="faq-icon" aria-hidden="true"></span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Chaque séance commence par un temps d'échange pour comprendre vos besoins et attentes. Emma adapte ensuite le massage à votre état du moment. La séance se termine par quelques minutes de retour au calme pour prolonger les bienfaits.</p>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" aria-expanded="false">
+                        Dois-je me dévêtir complètement ?
+                        <span class="faq-icon" aria-hidden="true"></span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Vous pouvez garder vos sous-vêtements. Un drap est utilisé pour couvrir les parties non travaillées. Votre pudeur et votre confort sont prioritaires — discutez-en librement avec Emma avant la séance.</p>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" aria-expanded="false">
+                        Quelle est la différence entre les types de massage ?
+                        <span class="faq-icon" aria-hidden="true"></span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Le <strong>massage suédois</strong> est doux et relaxant, idéal pour le stress. Le <strong>Deep Tissue</strong> cible les tensions profondes et les douleurs chroniques. Le <strong>massage thaï</strong> est plus dynamique, avec des étirements. Le <strong>massage chinois</strong> travaille sur les méridiens énergétiques. Emma peut vous guider dans votre choix.</p>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" aria-expanded="false">
+                        Y a-t-il des contre-indications ?
+                        <span class="faq-icon" aria-hidden="true"></span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Certaines conditions médicales peuvent contre-indiquer un massage (fièvre, inflammation aiguë, phlébite, certaines grossesses...). En cas de doute, consultez votre médecin. Emma est toujours disponible pour répondre à vos questions avant de réserver.</p>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question" aria-expanded="false">
+                        Comment réserver et régler ?
+                        <span class="faq-icon" aria-hidden="true"></span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>La réservation se fait par téléphone ou WhatsApp. Le règlement s'effectue directement après la séance, en espèces ou par virement bancaire. Les annulations doivent être signalées au moins 24h à l'avance.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -444,6 +586,13 @@
             <p class="footer-copy">&copy; 2026 Or du Temps. Tous droits réservés.</p>
         </div>
     </footer>
+
+    <!-- Bouton retour en haut -->
+    <button class="back-to-top" id="back-to-top" aria-label="Retour en haut de page">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+            <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
 
     <script src="script.js"></script>
 </body>

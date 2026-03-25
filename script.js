@@ -146,4 +146,113 @@ createParticles();
     // Pause on hover
     track.closest('.testimonials-section')?.addEventListener('mouseenter', () => clearInterval(timer));
     track.closest('.testimonials-section')?.addEventListener('mouseleave', startAuto);
+
+    // Swipe support (touch)
+    let touchStartX = 0;
+    track.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].screenX - touchStartX;
+        if (Math.abs(dx) > 50) {
+            goTo(dx < 0 ? current + 1 : current - 1);
+            startAuto();
+        }
+    }, { passive: true });
+})();
+
+/* ══════════════════════════════════
+   6. SCROLL PROGRESS BAR
+══════════════════════════════════ */
+const progressBar = document.getElementById('scroll-progress');
+if (progressBar) {
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        progressBar.style.width = pct + '%';
+    }, { passive: true });
+}
+
+/* ══════════════════════════════════
+   7. BACK TO TOP
+══════════════════════════════════ */
+const backToTopBtn = document.getElementById('back-to-top');
+if (backToTopBtn) {
+    window.addEventListener('scroll', () => {
+        backToTopBtn.classList.toggle('visible', window.scrollY > 500);
+    }, { passive: true });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
+
+/* ══════════════════════════════════
+   8. CUSTOM CURSOR (desktop)
+══════════════════════════════════ */
+(function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    const cursor = document.createElement('div');
+    cursor.className = 'custom-cursor';
+    document.body.appendChild(cursor);
+
+    let mx = -100, my = -100;
+
+    document.addEventListener('mousemove', e => {
+        mx = e.clientX;
+        my = e.clientY;
+        cursor.style.left = mx + 'px';
+        cursor.style.top = my + 'px';
+    });
+
+    document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('clicking'));
+
+    document.querySelectorAll('a, button, [role="button"], .service-card').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+    });
+})();
+
+/* ══════════════════════════════════
+   9. FAQ ACCORDION
+══════════════════════════════════ */
+document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+        // Close all others
+        document.querySelectorAll('.faq-question').forEach(other => {
+            if (other !== btn) {
+                other.setAttribute('aria-expanded', 'false');
+                other.closest('.faq-item').querySelector('.faq-answer').classList.remove('open');
+            }
+        });
+
+        btn.setAttribute('aria-expanded', String(!isOpen));
+        answer.classList.toggle('open', !isOpen);
+    });
+});
+
+/* ══════════════════════════════════
+   10. ACTIVE NAV LINK on scroll
+══════════════════════════════════ */
+(function () {
+    const sections = document.querySelectorAll('section[id], div[id="home"]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    const sectionObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                });
+            }
+        });
+    }, { threshold: 0.4, rootMargin: '-72px 0px 0px 0px' });
+
+    sections.forEach(s => sectionObserver.observe(s));
 })();
