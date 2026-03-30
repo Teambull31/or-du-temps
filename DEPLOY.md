@@ -112,7 +112,10 @@ EMAIL_USER=contact@ordutemps.fr
 EMAIL_PASS=ton-mot-de-passe-smtp
 EMAIL_TO=contact@ordutemps.fr
 CALENDLY_URL=https://calendly.com/emma-garcia
+ADMIN_PASSWORD=choisis-un-mot-de-passe-fort   # ← mot de passe espace admin Emma
 ```
+
+> **Important :** change `ADMIN_PASSWORD` — le défaut `ordutemps2026` ne doit jamais rester en production.
 
 **Sécuriser le fichier .env :**
 ```bash
@@ -150,6 +153,9 @@ Coller cette configuration (remplacer `ordutemps.fr` par ton domaine) :
 server {
     listen 80;
     server_name ordutemps.fr www.ordutemps.fr;
+
+    # Nécessaire pour l'upload de photos depuis l'espace admin (jusqu'à 4 Mo)
+    client_max_body_size 10m;
 
     location / {
         proxy_pass http://localhost:3000;
