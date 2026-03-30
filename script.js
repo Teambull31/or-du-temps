@@ -13,8 +13,22 @@
    sont appliquées ici automatiquement au chargement.
 ══════════════════════════════════ */
 (function applyConfig() {
+    // Application immédiate depuis le cache localStorage (évite le flash visuel)
     const _saved = localStorage.getItem('ordutemps_config');
     const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
+    if (Object.keys(cfg).length) _applyConfigData(cfg);
+
+    // Puis synchronisation avec le serveur (source de vérité)
+    fetch('/api/config')
+        .then(r => r.ok ? r.json() : null)
+        .then(serverCfg => {
+            if (!serverCfg || !Object.keys(serverCfg).length) return;
+            localStorage.setItem('ordutemps_config', JSON.stringify(serverCfg));
+            _applyConfigData(serverCfg);
+        })
+        .catch(() => {});
+
+    function _applyConfigData(cfg) {
     if (!Object.keys(cfg).length) return;
 
     // ── Helpers ──
@@ -380,6 +394,7 @@
             giftAmountsEl.style.display = 'flex';
         }
     }
+    } // fin _applyConfigData
 })();
 
 /* ══════════════════════════════════

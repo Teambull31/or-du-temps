@@ -816,6 +816,9 @@
     const PASS_KEY     = 'ordutemps_pass';
     const DEFAULT_PASS = 'ordutemps2026';
 
+    // Mot de passe de session (non persisté, effacé au rechargement)
+    let _sessionPwd = null;
+
     // ── Ctrl+S / Cmd+S pour sauvegarder ──
     document.addEventListener('keydown', e => {
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -955,19 +958,33 @@
         return localStorage.getItem(PASS_KEY) || DEFAULT_PASS;
     }
 
-    document.getElementById('login-form').addEventListener('submit', function(e) {
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const input = document.getElementById('pwd-input');
-        if (input.value === getStoredPass()) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-panel').classList.add('visible');
-            loadConfig();
-        } else {
-            input.classList.add('shake');
-            document.getElementById('login-error').classList.add('visible');
-            input.value = '';
-            setTimeout(() => input.classList.remove('shake'), 400);
-        }
+        // Vérification du mot de passe via le serveur
+        try {
+            const res = await fetch('/api/config', {
+                headers: { 'X-Admin-Password': input.value }
+            });
+            // On teste l'auth en tentant un GET protégé (le GET /api/config n'est pas protégé,
+            // donc on utilise un POST vide pour vérifier)
+            const check = await fetch('/api/admin/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Admin-Password': input.value },
+                body: JSON.stringify({})
+            });
+            if (check.status === 401) {
+                input.classList.add('shake');
+                document.getElementById('login-error').classList.add('visible');
+                input.value = '';
+                setTimeout(() => input.classList.remove('shake'), 400);
+                return;
+            }
+        } catch {}
+        _sessionPwd = input.value;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-panel').classList.add('visible');
+        loadConfig();
     });
 
     function publishConfig() {
@@ -1000,8 +1017,19 @@
     }
 
     // ── Chargement ──────────────────────────────────────────────────
-    function loadConfig() {
-        const saved    = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+    async function loadConfig() {
+        let saved = {};
+        try {
+            const res = await fetch('/api/config');
+            if (res.ok) {
+                saved = await res.json();
+                // Mise en cache locale pour les rechargements rapides
+                localStorage.setItem(CONFIG_KEY, JSON.stringify(saved));
+            }
+        } catch {
+            // Fallback : utiliser le cache localStorage si le serveur est inaccessible
+            saved = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+        }
         const defaults = getDefaults();
 
         getTextFields().forEach(id => {
@@ -1035,7 +1063,7 @@
     }
 
     // ── Sauvegarde ──────────────────────────────────────────────────
-    function saveConfig() {
+    async function saveConfig() {
         const cfg = {};
 
         getTextFields().forEach(id => {
@@ -1047,6 +1075,27 @@
         cfg.gallery_images = getCurrentGalleryImages();
         cfg.faq_items = JSON.parse(JSON.stringify(faqData));
         cfg.whatsapp_enabled = document.getElementById('whatsapp_enabled')?.value !== 'false';
+
+        try {
+            const res = await fetch('/api/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Password': _sessionPwd || ''
+                },
+                body: JSON.stringify(cfg)
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                showToast('⚠️ ' + (err.error || 'Erreur serveur.'), true);
+                return;
+            }
+        } catch {
+            showToast('⚠️ Impossible de joindre le serveur.', true);
+            return;
+        }
+
+        // Mise à jour du cache local
         localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
         saveToHistory(cfg);
         markClean();
@@ -1069,11 +1118,32 @@
             showToast('⚠️ Image trop grande (max 4 Mo). Compressez-la d\'abord.', true);
             return;
         }
+        const ext = file.name.split('.').pop() || 'jpg';
         const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById(inputId).value = e.target.result;
-            updatePreview(inputId, previewId);
-            showToast('Image chargée ! Cliquez sur Enregistrer.', false);
+        reader.onload = async function(e) {
+            // Extraire le base64 pur (sans le préfixe "data:image/...;base64,")
+            const base64 = e.target.result.split(',')[1];
+            showToast('Envoi en cours…', false);
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Password': _sessionPwd || ''
+                    },
+                    body: JSON.stringify({ data: base64, ext })
+                });
+                if (!res.ok) {
+                    showToast('⚠️ Erreur lors de l\'upload.', true);
+                    return;
+                }
+                const { url } = await res.json();
+                document.getElementById(inputId).value = url;
+                updatePreview(inputId, previewId);
+                showToast('Image uploadée ! Cliquez sur Enregistrer.', false);
+            } catch {
+                showToast('⚠️ Impossible de joindre le serveur.', true);
+            }
         };
         reader.readAsDataURL(file);
     }
@@ -1130,7 +1200,7 @@
     }
 
     // ── Mot de passe ─────────────────────────────────────────────────
-    function changePassword() {
+    async function changePassword() {
         const newPwd  = document.getElementById('new-pwd').value;
         const confirm = document.getElementById('confirm-pwd').value;
         const fb      = document.getElementById('pwd-feedback');
@@ -1139,10 +1209,32 @@
         if (newPwd.length < 6) { fb.textContent = 'Le mot de passe doit contenir au moins 6 caractères.'; fb.className = 'feedback-msg error'; return; }
         if (newPwd !== confirm) { fb.textContent = 'Les deux mots de passe ne correspondent pas.'; fb.className = 'feedback-msg error'; return; }
 
-        localStorage.setItem(PASS_KEY, newPwd);
+        try {
+            const res = await fetch('/api/admin/password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Password': _sessionPwd || ''
+                },
+                body: JSON.stringify({ newPassword: newPwd })
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                fb.textContent = err.error || 'Erreur serveur.';
+                fb.className = 'feedback-msg error';
+                return;
+            }
+        } catch {
+            fb.textContent = 'Impossible de joindre le serveur.';
+            fb.className = 'feedback-msg error';
+            return;
+        }
+
+        // Mettre à jour le mot de passe de session
+        _sessionPwd = newPwd;
         document.getElementById('new-pwd').value = '';
         document.getElementById('confirm-pwd').value = '';
-        fb.textContent = '✓ Mot de passe mis à jour avec succès.';
+        fb.textContent = '✓ Mot de passe mis à jour sur le serveur.';
         fb.className   = 'feedback-msg success';
         setTimeout(() => { fb.textContent = ''; }, 4000);
     }
@@ -1166,17 +1258,26 @@
         const fb = document.getElementById('import-feedback');
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             try {
                 const cfg = JSON.parse(e.target.result);
                 if (!confirm('Êtes-vous sûr de vouloir restaurer cette sauvegarde ? Vos modifications actuelles seront remplacées.')) return;
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Password': _sessionPwd || ''
+                    },
+                    body: JSON.stringify(cfg)
+                });
+                if (!res.ok) { throw new Error('server'); }
                 localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
                 loadConfig();
                 fb.textContent = '✓ Sauvegarde restaurée avec succès.';
                 fb.className   = 'feedback-msg success';
                 showToast('✓ Sauvegarde restaurée !');
             } catch {
-                fb.textContent = 'Fichier invalide. Assurez-vous d\'utiliser un fichier de sauvegarde Or du Temps.';
+                fb.textContent = 'Fichier invalide ou erreur serveur.';
                 fb.className   = 'feedback-msg error';
             }
         };
@@ -1185,8 +1286,18 @@
     }
 
     // ── Réinitialisation ──────────────────────────────────────────────
-    function resetConfig() {
+    async function resetConfig() {
         if (!confirm('Remettre tout à zéro ? Cette action est irréversible.\n\nConseil : téléchargez d\'abord une sauvegarde via le bouton "Télécharger ma sauvegarde".')) return;
+        try {
+            await fetch('/api/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Password': _sessionPwd || ''
+                },
+                body: JSON.stringify({})
+            });
+        } catch {}
         localStorage.removeItem(CONFIG_KEY);
         loadConfig();
         showToast('Site réinitialisé aux valeurs d\'origine.');
