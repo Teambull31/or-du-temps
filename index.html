@@ -413,121 +413,101 @@
                 <h2 class="section-title">Soins &amp; Tarifs</h2>
                 <p class="section-lead">Chaque soin est personnalisé selon vos besoins du moment.</p>
             </div>
-            <div class="services-grid">
-                <!-- Massage Signature -->
-                <article class="service-card reveal" id="soin-signature">
-                    <div class="card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 48 48" fill="none">
-                            <path d="M24 6C15 6 9 14 9 22C9 32 16 38 24 42C32 38 39 32 39 22C39 14 33 6 24 6Z"
-                                stroke="#C9A84C" stroke-width="1.5" />
-                            <circle cx="24" cy="22" r="5" fill="#C9A84C" opacity="0.7" />
+            <!-- Tarifs restructurés -->
+            <div class="tarifs-container reveal">
+
+                <!-- Massage sur mesure -->
+                <div class="tarif-category">
+                    <div class="tarif-cat-header">
+                        <svg width="18" height="18" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                            <circle cx="20" cy="20" r="4" fill="#C9A84C"/>
+                            <path d="M20 4V8M20 32V36M4 20H8M32 20H36M8.34 8.34L11.17 11.17M28.83 28.83L31.66 31.66M8.34 31.66L11.17 28.83M28.83 11.17L31.66 8.34" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
                         </svg>
+                        <h3 class="tarif-cat-title">Massage sur mesure</h3>
                     </div>
-                    <div class="card-body">
-                        <h3>Massage Signature</h3>
-                        <p>Notre création exclusive. Un voyage en plusieurs étapes mêlant effleurages doux, pressions
-                            profondes et étirements pour une relaxation absolue.</p>
+                    <p class="tarif-cat-desc" id="desc-sur-mesure">Soin entièrement personnalisé selon vos besoins du moment — techniques, zones travaillées et pression adaptées à votre ressenti.</p>
+                    <div class="tarif-rows">
+                        <div class="tarif-row">
+                            <span class="tarif-name">1 h 30 min</span>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-sm-90">75€</span>
+                        </div>
+                        <div class="tarif-row">
+                            <span class="tarif-name">1 heure</span>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-sm-60">60€</span>
+                        </div>
+                        <div class="tarif-row">
+                            <span class="tarif-name">45 min</span>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-sm-45">55€</span>
+                        </div>
+                        <div class="tarif-row">
+                            <span class="tarif-name">30 min</span>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-sm-30">50€</span>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <span class="price-tag">1h30 · <strong>70 €</strong></span>
-                    </div>
-                </article>
-                <!-- Massage Chinois -->
-                <article class="service-card reveal" id="soin-chinois">
-                    <div class="card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 48 48" fill="none">
-                            <path d="M12 36 Q24 6 36 36" stroke="#C9A84C" stroke-width="1.5" />
-                            <path d="M8 24 H40" stroke="#C9A84C" stroke-width="1.5" />
-                            <circle cx="24" cy="24" r="4" fill="#C9A84C" opacity="0.7" />
-                        </svg>
-                    </div>
-                    <div class="card-body">
-                        <h3>Massage Chinois</h3>
-                        <p>Énergétique et tonique, ce massage ancestral travaille sur les méridiens pour rééquilibrer le
-                            flux vital et libérer les blocages.</p>
-                    </div>
-                    <div class="card-footer">
-                        <span class="price-tag">Sur devis</span>
-                    </div>
-                </article>
-                <!-- Deep Tissue -->
-                <article class="service-card reveal" id="soin-deep-tissue">
-                    <div class="card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 48 48" fill="none">
-                            <rect x="14" y="10" width="20" height="28" rx="10" stroke="#C9A84C" stroke-width="1.5" />
-                            <path d="M19 20 H29 M19 24 H29 M19 28 H26" stroke="#C9A84C" stroke-width="1.5" />
-                        </svg>
-                    </div>
-                    <div class="card-body">
-                        <h3>Deep Tissue</h3>
-                        <p>Ciblant les couches profondes du tissu musculaire, ce massage libère les tensions chroniques
-                            et soulage douleurs et raideurs persistantes.</p>
-                    </div>
-                    <div class="card-footer">
-                        <span class="price-tag">Sur devis</span>
-                    </div>
-                </article>
-                <!-- Massage Suédois -->
-                <article class="service-card reveal" id="soin-suedois">
-                    <div class="card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 48 48" fill="none">
-                            <path d="M10 30 Q18 12 24 20 Q30 28 38 10" stroke="#C9A84C" stroke-width="1.5" />
-                            <circle cx="24" cy="24" r="6" stroke="#C9A84C" stroke-width="1.5" />
-                        </svg>
-                    </div>
-                    <div class="card-body">
-                        <h3>Massage Suédois</h3>
-                        <p>Le classique par excellence. Long effleurages glissés pour apaiser le système nerveux,
-                            améliorer la circulation et dissoudre le stress.</p>
-                    </div>
-                    <div class="card-footer">
-                        <span class="price-tag">Sur devis</span>
-                    </div>
-                </article>
-                <!-- Massage Thaï -->
-                <article class="service-card reveal" id="soin-thai">
-                    <div class="card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 48 48" fill="none">
-                            <path d="M24 10 L20 20 L10 20 L18 27 L15 38 L24 31 L33 38 L30 27 L38 20 L28 20Z"
-                                stroke="#C9A84C" stroke-width="1.5" />
-                        </svg>
-                    </div>
-                    <div class="card-body">
-                        <h3>Massage Thaï</h3>
-                        <p>Pratiqué sur tapis, ce massage dynamique associe pressions rythmées et étirements profonds
-                            pour retrouver souplesse et énergie vitale.</p>
-                    </div>
-                    <div class="card-footer">
-                        <span class="price-tag">Sur devis</span>
-                    </div>
-                </article>
-                <!-- Ado -->
-                <article class="service-card service-card--ado reveal" id="soin-ado">
-                    <div class="card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 48 48" fill="none">
-                            <circle cx="24" cy="16" r="7" stroke="#C9A84C" stroke-width="1.5" />
-                            <path d="M12 38 C12 28 36 28 36 38" stroke="#C9A84C" stroke-width="1.5" />
-                        </svg>
-                    </div>
-                    <div class="card-body">
-                        <h3>Soin Adolescent</h3>
-                        <p>Spécialement adapté aux 11–18 ans. Un moment doux pour apprendre à écouter son corps et se
-                            (re)connecter à soi-même.</p>
-                    </div>
-                    <div class="card-footer">
-                        <span class="price-tag">1h · <strong>50 €</strong></span>
-                    </div>
-                </article>
-            </div>
-            <!-- Tarif global -->
-            <div class="pricing-banner reveal">
-                <div class="pricing-banner-inner">
-                    <svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                        <path d="M20 8 C14 14 10 20 20 26 C30 20 26 14 20 8Z" fill="#C9A84C" />
-                    </svg>
-                    <p><strong>Tarifs adultes :</strong> 1h30 – 70 € &nbsp;|&nbsp; 2h – 90 €</p>
                 </div>
+
+                <!-- Massages spécifiques -->
+                <div class="tarif-category">
+                    <div class="tarif-cat-header">
+                        <svg width="18" height="18" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                            <circle cx="20" cy="20" r="4" fill="#C9A84C"/>
+                            <path d="M20 4V8M20 32V36M4 20H8M32 20H36M8.34 8.34L11.17 11.17M28.83 28.83L31.66 31.66M8.34 31.66L11.17 28.83M28.83 11.17L31.66 8.34" stroke="#C9A84C" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <div>
+                            <h3 class="tarif-cat-title">Massages spécifiques – 1 heure</h3>
+                            <p class="tarif-cat-subtitle">(me prévenir à l'avance)</p>
+                        </div>
+                    </div>
+                    <div class="tarif-rows">
+                        <div class="tarif-row">
+                            <div class="tarif-name-group">
+                                <span class="tarif-name">Deep tissue</span>
+                                <span class="tarif-desc" id="desc-deep">Libère les tensions musculaires profondes, soulage les douleurs et raideurs chroniques.</span>
+                            </div>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-deep">75€</span>
+                        </div>
+                        <div class="tarif-row">
+                            <div class="tarif-name-group">
+                                <span class="tarif-name">Ayurvédique</span>
+                                <span class="tarif-desc" id="desc-ayurvedique">Rééquilibre l'énergie vitale, apaise le système nerveux et favorise la détoxification.</span>
+                            </div>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-ayurvedique">75€</span>
+                        </div>
+                        <div class="tarif-row">
+                            <div class="tarif-name-group">
+                                <span class="tarif-name">Thaïlandais</span>
+                                <span class="tarif-desc" id="desc-thai">Améliore la souplesse et la circulation via étirements profonds et pressions rythmées.</span>
+                            </div>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-thai">75€</span>
+                        </div>
+                        <div class="tarif-row">
+                            <div class="tarif-name-group">
+                                <span class="tarif-name">Kobido</span>
+                                <span class="tarif-desc" id="desc-kobido">Tonifie les muscles du visage, lisse les traits et redonne éclat — lifting naturel anti-âge.</span>
+                            </div>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-kobido">75€</span>
+                        </div>
+                        <div class="tarif-row">
+                            <div class="tarif-name-group">
+                                <span class="tarif-name">Drainage Lymphatique</span>
+                                <span class="tarif-desc" id="desc-drainage">Élimine toxines et rétention d'eau, réduit les gonflements et booste les défenses naturelles.</span>
+                            </div>
+                            <span class="tarif-line"></span>
+                            <span class="tarif-price" id="tarif-drainage">70€</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+            <p class="tarif-legal reveal">Massage à but non thérapeutique</p>
         </div>
     </section>
 
@@ -569,8 +549,8 @@
             <div class="emma-text-side">
                 <p class="section-eyebrow">Votre Praticienne</p>
                 <h2 class="section-title">Emma Garcia</h2>
-                <p>Passionnée par le bien-être depuis plus de 10 ans, Emma a été formée aux techniques de massage en
-                    France, en Thaïlande et en Chine. Elle met son expertise et sa sensibilité au service de chaque
+                <p>Passionnée par le bien-être depuis plus de 4 ans, Emma a été formée aux techniques de massage en
+                    France à Toulouse dans l'école . Elle met son expertise et sa sensibilité au service de chaque
                     client.</p>
                 <p>Son approche est avant tout <strong>personnalisée et intuitive</strong> : elle adapte chaque soin à
                     vos tensions, votre morphologie et votre état émotionnel du jour.</p>
