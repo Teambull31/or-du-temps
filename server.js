@@ -120,6 +120,13 @@ app.post('/api/admin/password', (req, res) => {
 });
 
 /* ══════════════════════════════════
+   GET /emma — Espace admin
+══════════════════════════════════ */
+app.get('/emma', (req, res) => {
+    res.sendFile(path.join(__dirname, 'emma.html'));
+});
+
+/* ══════════════════════════════════
    POST /api/contact — Formulaire
 ══════════════════════════════════ */
 app.post('/api/contact', async (req, res) => {
