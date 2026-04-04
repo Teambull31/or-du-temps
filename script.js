@@ -13,8 +13,22 @@
    sont appliquées ici automatiquement au chargement.
 ══════════════════════════════════ */
 (function applyConfig() {
+    // Application immédiate depuis le cache localStorage (évite le flash visuel)
     const _saved = localStorage.getItem('ordutemps_config');
     const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
+    if (Object.keys(cfg).length) _applyConfigData(cfg);
+
+    // Puis synchronisation avec le serveur (source de vérité)
+    fetch('/api/config')
+        .then(r => r.ok ? r.json() : null)
+        .then(serverCfg => {
+            if (!serverCfg || !Object.keys(serverCfg).length) return;
+            localStorage.setItem('ordutemps_config', JSON.stringify(serverCfg));
+            _applyConfigData(serverCfg);
+        })
+        .catch(() => {});
+
+    function _applyConfigData(cfg) {
     if (!Object.keys(cfg).length) return;
 
     // ── Helpers ──
@@ -121,33 +135,29 @@
         if (horEl) horEl.innerHTML = cfg.horaires.replace(/\n/g, '<br>');
     }
 
-    // ── Tarifs & descriptions des soins ──
-    const soins = {
-        'soin-signature':   { prix: cfg.prix_signature, desc: cfg.desc_signature },
-        'soin-chinois':     { prix: cfg.prix_chinois,   desc: cfg.desc_chinois   },
-        'soin-deep-tissue': { prix: cfg.prix_deep,      desc: cfg.desc_deep      },
-        'soin-suedois':     { prix: cfg.prix_suedois,   desc: cfg.desc_suedois   },
-        'soin-thai':        { prix: cfg.prix_thai,      desc: cfg.desc_thai      },
-        'soin-ado':         { prix: cfg.prix_ado,       desc: cfg.desc_ado       },
+    // ── Tarifs restructurés ──
+    const tarifsEtDescs = {
+        'tarif-sm-90':       { val: cfg.prix_sm_90 },
+        'tarif-sm-60':       { val: cfg.prix_sm_60 },
+        'tarif-sm-45':       { val: cfg.prix_sm_45 },
+        'tarif-sm-30':       { val: cfg.prix_sm_30 },
+        'tarif-deep':        { val: cfg.prix_deep },
+        'tarif-ayurvedique': { val: cfg.prix_ayurvedique },
+        'tarif-thai':        { val: cfg.prix_thai },
+        'tarif-kobido':      { val: cfg.prix_kobido },
+        'tarif-drainage':    { val: cfg.prix_drainage },
+        'desc-sur-mesure':   { val: cfg.desc_sur_mesure },
+        'desc-deep':         { val: cfg.desc_deep },
+        'desc-ayurvedique':  { val: cfg.desc_ayurvedique },
+        'desc-thai':         { val: cfg.desc_thai },
+        'desc-kobido':       { val: cfg.desc_kobido },
+        'desc-drainage':     { val: cfg.desc_drainage },
     };
-    Object.entries(soins).forEach(([id, data]) => {
-        const card = document.querySelector('#' + id);
-        if (!card) return;
-        if (data.prix) {
-            const prEl = card.querySelector('.price-tag');
-            if (prEl) prEl.innerHTML = formatPrix(data.prix);
-        }
-        if (data.desc) {
-            const descEl = card.querySelector('.card-body p');
-            if (descEl) descEl.textContent = data.desc;
-        }
+    Object.entries(tarifsEtDescs).forEach(([id, data]) => {
+        if (!data.val) return;
+        const el = document.getElementById(id);
+        if (el) el.textContent = data.val;
     });
-
-    // ── Bandeau tarifs ──
-    if (cfg.prix_banner) {
-        const bannerEl = document.querySelector('.pricing-banner-inner p');
-        if (bannerEl) bannerEl.innerHTML = '<strong>Tarifs adultes\u00a0:</strong> ' + cfg.prix_banner;
-    }
 
     // ── WhatsApp ──
     const waBtn = document.getElementById('whatsapp-btn');
@@ -380,6 +390,7 @@
             giftAmountsEl.style.display = 'flex';
         }
     }
+    } // fin _applyConfigData
 })();
 
 /* ══════════════════════════════════
