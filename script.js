@@ -282,7 +282,7 @@
         const faqList = document.getElementById('faq-list');
         if (faqList) {
             faqList.innerHTML = cfg.faq_items.map(item => `
-                <div class="faq-item reveal">
+                <div class="faq-item">
                     <button class="faq-question" aria-expanded="false">
                         <span class="faq-q-text">${item.q}</span>
                         <span class="faq-arrow" aria-hidden="true">+</span>
@@ -566,15 +566,21 @@ createParticles();
 ══════════════════════════════════ */
 (function () {
     const track = document.getElementById('testimonials-track');
-    const dots = document.querySelectorAll('.t-dot');
-    if (!track || !dots.length) return;
+    const nav = document.querySelector('.testimonials-nav');
+    if (!track || !nav) return;
 
     let current = 0;
     let timer;
-    const TOTAL = dots.length;
     const DELAY = 5000;
 
+    function getDots() {
+        return document.querySelectorAll('.t-dot');
+    }
+
     function goTo(index) {
+        const dots = getDots();
+        const TOTAL = dots.length;
+        if (!TOTAL) return;
         current = (index + TOTAL) % TOTAL;
         track.style.transform = `translateX(-${current * 100}%)`;
         dots.forEach((d, i) => d.classList.toggle('t-dot--active', i === current));
@@ -585,18 +591,25 @@ createParticles();
         timer = setInterval(() => goTo(current + 1), DELAY);
     }
 
-    dots.forEach((dot, i) => {
-        dot.addEventListener('click', () => {
+    nav.addEventListener('click', (e) => {
+        const dot = e.target.closest('.t-dot');
+        if (!dot) return;
+        const dots = Array.from(getDots());
+        const i = dots.indexOf(dot);
+        if (i > -1) {
             goTo(i);
             startAuto();
-        });
+        }
     });
 
     startAuto();
 
     // Pause on hover
-    track.closest('.testimonials-section')?.addEventListener('mouseenter', () => clearInterval(timer));
-    track.closest('.testimonials-section')?.addEventListener('mouseleave', startAuto);
+    const section = track.closest('.testimonials-section');
+    if (section) {
+        section.addEventListener('mouseenter', () => clearInterval(timer));
+        section.addEventListener('mouseleave', startAuto);
+    }
 })();
 
 /* ══════════════════════════════════
@@ -741,23 +754,26 @@ createParticles();
 /* ══════════════════════════════════
    8. FAQ ACCORDÉON
 ══════════════════════════════════ */
-function initFaqListeners(container) {
-    (container || document).querySelectorAll('.faq-question').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const answer = btn.nextElementSibling;
-            const isOpen = btn.getAttribute('aria-expanded') === 'true';
-            (container || document).querySelectorAll('.faq-question').forEach(other => {
-                if (other !== btn) {
-                    other.setAttribute('aria-expanded', 'false');
-                    other.nextElementSibling?.classList.remove('open');
-                }
-            });
-            btn.setAttribute('aria-expanded', String(!isOpen));
-            answer?.classList.toggle('open', !isOpen);
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.faq-question');
+    if (!btn) return;
+    
+    const answer = btn.nextElementSibling;
+    const isOpen = btn.getAttribute('aria-expanded') === 'true';
+    
+    const faqList = btn.closest('.faq-list');
+    if (faqList) {
+        faqList.querySelectorAll('.faq-question').forEach(other => {
+            if (other !== btn) {
+                other.setAttribute('aria-expanded', 'false');
+                other.nextElementSibling?.classList.remove('open');
+            }
         });
-    });
-}
-initFaqListeners();
+    }
+
+    btn.setAttribute('aria-expanded', String(!isOpen));
+    answer?.classList.toggle('open', !isOpen);
+});
 
 /* ══════════════════════════════════
    9. BACK TO TOP
