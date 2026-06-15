@@ -13,8 +13,13 @@
    sont appliquées ici automatiquement au chargement.
 ══════════════════════════════════ */
 (function applyConfig() {
+    // Clé de cache versionnée : l'ancien cache (chemins /assets/uploads/…
+    // qui n'existent plus sur Vercel) est ignoré au premier chargement.
+    const CACHE_KEY = 'ordutemps_config_v2';
+    try { localStorage.removeItem('ordutemps_config'); } catch {}
+
     // Application immédiate depuis le cache localStorage (évite le flash visuel)
-    const _saved = localStorage.getItem('ordutemps_config');
+    const _saved = localStorage.getItem(CACHE_KEY);
     const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
     if (Object.keys(cfg).length) _applyConfigData(cfg);
 
@@ -23,7 +28,7 @@
         .then(r => r.ok ? r.json() : null)
         .then(serverCfg => {
             if (!serverCfg || !Object.keys(serverCfg).length) return;
-            localStorage.setItem('ordutemps_config', JSON.stringify(serverCfg));
+            localStorage.setItem(CACHE_KEY, JSON.stringify(serverCfg));
             _applyConfigData(serverCfg);
         })
         .catch(() => {});

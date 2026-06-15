@@ -1364,23 +1364,14 @@
                 <p class="section-desc">Gérez l'accès à cet espace administrateur et sauvegardez vos données.</p>
 
                 <div class="section-block">
-                    <p class="block-title">Changer le mot de passe</p>
+                    <p class="block-title">Mot de passe d'accès</p>
                     <div class="security-info">
-                        Le mot de passe par défaut est <strong>ordutemps2026</strong>. Changez-le dès que possible et
-                        notez le nouveau quelque part en cas d'oubli.
+                        Le mot de passe de cet espace est défini de façon sécurisée dans les réglages
+                        d'hébergement (variable <strong>ADMIN_PASSWORD</strong> sur Vercel). Pour le
+                        modifier, ouvrez votre projet sur Vercel → <em>Settings → Environment Variables</em>,
+                        changez la valeur de <strong>ADMIN_PASSWORD</strong>, puis redéployez. En cas de doute,
+                        contactez la personne qui gère le site.
                     </div>
-                    <div class="field-group">
-                        <label class="field-label">Nouveau mot de passe</label>
-                        <input type="password" id="new-pwd" class="field-input" placeholder="Minimum 6 caractères"
-                            autocomplete="new-password">
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label">Confirmer le nouveau mot de passe</label>
-                        <input type="password" id="confirm-pwd" class="field-input"
-                            placeholder="Répétez le mot de passe" autocomplete="new-password">
-                    </div>
-                    <button class="btn-action" onclick="changePassword()">Mettre à jour le mot de passe</button>
-                    <p id="pwd-feedback" class="feedback-msg"></p>
                 </div>
 
                 <div class="section-block">
@@ -1439,13 +1430,37 @@
 
     <div id="toast" class="toast"></div>
 
+    <!-- SDK Vercel Blob (upload direct navigateur → stockage en ligne) -->
+    <script type="module">
+        import { upload } from 'https://esm.sh/@vercel/blob@0.27.0/client';
+        window.__blobUpload = upload;
+    </script>
+
     <script>
-        const CONFIG_KEY = 'ordutemps_config';
+        const CONFIG_KEY = 'ordutemps_config_v2';
         const PASS_KEY = 'ordutemps_pass';
         const DEFAULT_PASS = 'ordutemps2026';
 
         // Mot de passe de session (non persisté, effacé au rechargement)
         let _sessionPwd = null;
+
+        // ── Upload direct vers Vercel Blob ─────────────────────────────
+        // Le navigateur téléverse directement vers le stockage en ligne ;
+        // le serveur ne fait qu'émettre un token signé après vérification
+        // du mot de passe admin (route /api/blob/upload). Cela permet les
+        // gros fichiers (vidéos) et évite la limite de 4,5 Mo des fonctions.
+        async function uploadToBlob(file, prefix) {
+            if (!window.__blobUpload) {
+                throw new Error('Module d\'upload non chargé. Rechargez la page.');
+            }
+            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            const blob = await window.__blobUpload(`${prefix}/${Date.now()}-${safeName}`, file, {
+                access: 'public',
+                handleUploadUrl: '/api/blob/upload',
+                clientPayload: _sessionPwd || '',
+            });
+            return blob.url;
+        }
 
         // ── Ctrl+S / Cmd+S pour sauvegarder ──
         document.addEventListener('keydown', e => {
@@ -1615,19 +1630,14 @@
             loadConfig();
         });
 
-        function publishConfig() {
-            const raw = localStorage.getItem('ordutemps_config');
-            if (!raw) { showToast('⚠️ Enregistrez d\'abord vos modifications.', true); return; }
-            const date = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const content = '// Configuration Or du Temps — publiée le ' + date + '\n' +
-                '// Committez ce fichier dans git pour que tous les appareils voient le même site.\n' +
-                'window.__ODT_DEFAULT_CONFIG__ = ' + raw + ';\n';
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([content], { type: 'application/javascript' }));
-            a.download = 'config.js';
-            a.click();
-            URL.revokeObjectURL(a.href);
-            showToast('config.js téléchargé ! Committez-le dans git pour publier.');
+        // Sur Vercel, « Enregistrer » sauvegarde directement en ligne :
+        // les modifications sont immédiatement visibles par tous les
+        // visiteurs, sur tous les appareils. Plus besoin de télécharger
+        // ni de committer de fichier.
+        async function publishConfig() {
+            if (await saveConfig()) {
+                showToast('✓ Publié ! Vos modifications sont visibles par tous les visiteurs.');
+            }
         }
 
         function logout() {
@@ -1716,11 +1726,11 @@
                 if (!res.ok) {
                     const err = await res.json();
                     showToast('⚠️ ' + (err.error || 'Erreur serveur.'), true);
-                    return;
+                    return false;
                 }
             } catch {
                 showToast('⚠️ Impossible de joindre le serveur.', true);
-                return;
+                return false;
             }
 
             // Mise à jour du cache local
@@ -1728,6 +1738,7 @@
             saveToHistory(cfg);
             markClean();
             showToast('✓ Modifications enregistrées !');
+            return true;
         }
 
         // ── Photos ──────────────────────────────────────────────────────
@@ -1739,41 +1750,22 @@
             prev.style.opacity = val ? '1' : '.2';
         }
 
-        function handleUpload(inputId, previewId, fileInput) {
+        async function handleUpload(inputId, previewId, fileInput) {
             const file = fileInput.files[0];
             if (!file) return;
-            if (file.size > 4 * 1024 * 1024) {
-                showToast('⚠️ Image trop grande (max 4 Mo). Compressez-la d\'abord.', true);
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('⚠️ Image trop grande (max 10 Mo). Compressez-la d\'abord.', true);
                 return;
             }
-            const ext = file.name.split('.').pop() || 'jpg';
-            const reader = new FileReader();
-            reader.onload = async function (e) {
-                // Extraire le base64 pur (sans le préfixe "data:image/...;base64,")
-                const base64 = e.target.result.split(',')[1];
-                showToast('Envoi en cours…', false);
-                try {
-                    const res = await fetch('/api/upload', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Admin-Password': _sessionPwd || ''
-                        },
-                        body: JSON.stringify({ data: base64, ext })
-                    });
-                    if (!res.ok) {
-                        showToast('⚠️ Erreur lors de l\'upload.', true);
-                        return;
-                    }
-                    const { url } = await res.json();
-                    document.getElementById(inputId).value = url;
-                    updatePreview(inputId, previewId);
-                    showToast('Image uploadée ! Cliquez sur Enregistrer.', false);
-                } catch {
-                    showToast('⚠️ Impossible de joindre le serveur.', true);
-                }
-            };
-            reader.readAsDataURL(file);
+            showToast('Envoi en cours…', false);
+            try {
+                const url = await uploadToBlob(file, 'photos');
+                document.getElementById(inputId).value = url;
+                updatePreview(inputId, previewId);
+                showToast('Image uploadée ! Cliquez sur Enregistrer.', false);
+            } catch (err) {
+                showToast('⚠️ ' + (err.message || 'Erreur lors de l\'upload.'), true);
+            }
         }
 
         // ── Témoignages ─────────────────────────────────────────────────
@@ -1825,46 +1817,6 @@
             if (!confirm('Supprimer cet avis client ?')) return;
             testimonialsData.splice(i, 1);
             renderTestimonialsList();
-        }
-
-        // ── Mot de passe ─────────────────────────────────────────────────
-        async function changePassword() {
-            const newPwd = document.getElementById('new-pwd').value;
-            const confirm = document.getElementById('confirm-pwd').value;
-            const fb = document.getElementById('pwd-feedback');
-
-            if (!newPwd) { fb.textContent = 'Entrez un nouveau mot de passe.'; fb.className = 'feedback-msg error'; return; }
-            if (newPwd.length < 6) { fb.textContent = 'Le mot de passe doit contenir au moins 6 caractères.'; fb.className = 'feedback-msg error'; return; }
-            if (newPwd !== confirm) { fb.textContent = 'Les deux mots de passe ne correspondent pas.'; fb.className = 'feedback-msg error'; return; }
-
-            try {
-                const res = await fetch('/api/admin/password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': _sessionPwd || ''
-                    },
-                    body: JSON.stringify({ newPassword: newPwd })
-                });
-                if (!res.ok) {
-                    const err = await res.json();
-                    fb.textContent = err.error || 'Erreur serveur.';
-                    fb.className = 'feedback-msg error';
-                    return;
-                }
-            } catch {
-                fb.textContent = 'Impossible de joindre le serveur.';
-                fb.className = 'feedback-msg error';
-                return;
-            }
-
-            // Mettre à jour le mot de passe de session
-            _sessionPwd = newPwd;
-            document.getElementById('new-pwd').value = '';
-            document.getElementById('confirm-pwd').value = '';
-            fb.textContent = '✓ Mot de passe mis à jour sur le serveur.';
-            fb.className = 'feedback-msg success';
-            setTimeout(() => { fb.textContent = ''; }, 4000);
         }
 
         // ── Export / Import ───────────────────────────────────────────────
@@ -2315,38 +2267,40 @@
             if (thumb) { thumb.src = input.value; thumb.style.opacity = input.value ? '1' : '.2'; }
         }
 
-        function handleGalleryUpload(i, fileInput) {
+        async function handleGalleryUpload(i, fileInput) {
             const file = fileInput.files[0];
             if (!file) return;
-            if (file.size > 4 * 1024 * 1024) { showToast('⚠️ Image trop grande (max 4 Mo)', true); return; }
-            const reader = new FileReader();
-            reader.onload = e => {
+            if (file.size > 10 * 1024 * 1024) { showToast('⚠️ Image trop grande (max 10 Mo)', true); return; }
+            showToast('Envoi en cours…', false);
+            try {
+                const url = await uploadToBlob(file, 'gallery');
                 const srcInput = document.querySelector(`.gallery-src[data-index="${i}"]`);
-                if (srcInput) { srcInput.value = e.target.result; updateGalleryPreview(i, srcInput); }
+                if (srcInput) { srcInput.value = url; updateGalleryPreview(i, srcInput); }
                 showToast('Image chargée ! Cliquez sur Enregistrer.');
-            };
-            reader.readAsDataURL(file);
+            } catch (err) {
+                showToast('⚠️ ' + (err.message || 'Erreur lors du chargement'), true);
+            }
         }
 
-        function handleGalleryVideoUpload(i, fileInput) {
+        async function handleGalleryVideoUpload(i, fileInput) {
             const file = fileInput.files[0];
             if (!file) return;
-            if (file.size > 50 * 1024 * 1024) { showToast('⚠️ Vidéo trop grande (max 50 Mo)', true); return; }
-            const key = 'gallery_video_' + i + '_' + Date.now();
-            storeVideoDB(key, file).then(() => {
+            if (file.size > 200 * 1024 * 1024) { showToast('⚠️ Vidéo trop grande (max 200 Mo)', true); return; }
+            showToast('Envoi de la vidéo en cours…', false);
+            try {
+                const url = await uploadToBlob(file, 'videos');
                 const imgs = getCurrentGalleryImages();
-                imgs[i] = { type: 'video', videoKey: key, alt: imgs[i]?.alt || '' };
+                imgs[i] = { type: 'video-url', src: url, alt: imgs[i]?.alt || '' };
                 renderGalleryAdmin(imgs);
                 markDirty();
                 showToast('Vidéo chargée ! Cliquez sur Enregistrer.');
-            }).catch(() => showToast('⚠️ Erreur lors du chargement', true));
+            } catch (err) {
+                showToast('⚠️ ' + (err.message || 'Erreur lors du chargement'), true);
+            }
         }
 
         function removeGalleryVideo(i) {
             if (!confirm('Supprimer cette vidéo et revenir à une photo ?')) return;
-            const editors = document.querySelectorAll('#gallery-admin-list .photo-editor');
-            const videoKey = editors[i]?.dataset.videoKey;
-            if (videoKey) deleteVideoDB(videoKey).catch(() => { });
             const imgs = getCurrentGalleryImages();
             imgs[i] = { type: 'image', src: '', alt: '' };
             renderGalleryAdmin(imgs);
