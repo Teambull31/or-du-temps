@@ -4,3 +4,6 @@ node_modules/
 data/
 assets/uploads/
 .vercel
+
+# Fichiers temporaires de session (.remember)
+.remember/tmp/
