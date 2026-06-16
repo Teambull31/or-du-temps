@@ -2,9 +2,7 @@
   "name": "or-du-temps",
   "version": "1.0.0",
   "description": "Site vitrine Or du Temps — Institut de massage bien-être",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
     "dev": "node --watch server.js"
   },
   "dependencies": {
