@@ -29,6 +29,19 @@ espace admin `/emma` où Emma modifie elle-même textes, **photos** et **vidéos
 - **Framework Preset : Other.** Pas de build command. Install command :
   `npm install`. Output : laisser vide (site statique + fonctions).
 
+> Le preset est déjà épinglé côté repo par `"framework": null` dans `vercel.json`,
+> qui écrase le réglage du projet. C'est ce qui corrige l'erreur
+> `No entrypoint found which imports express` : un preset « express » côté projet
+> entrait en conflit avec le modèle statique + fonctions du code. Ne pas le retirer.
+
+### 1 bis. Si le projet Vercel existe déjà
+Le projet `or-du-temps` est déjà relié au repo. Dans ce cas, rien à importer :
+- **Settings → Git → Production Branch** : pointer sur la branche à publier,
+  sinon les pushes ne produisent que des déploiements *preview* (protégés par SSO,
+  donc non publics).
+- Un déploiement preview vert peut aussi être promu en production depuis
+  l'onglet **Deployments** (menu « ⋯ » → *Promote to Production*).
+
 ### 2. Créer le store Blob
 - Dans le projet : **Storage → Create Database → Blob** → relier au projet.
 - Cela injecte automatiquement `BLOB_READ_WRITE_TOKEN` dans l'environnement de
@@ -45,6 +58,15 @@ espace admin `/emma` où Emma modifie elle-même textes, **photos** et **vidéos
 
 > `BLOB_READ_WRITE_TOKEN` est ajouté automatiquement par le store Blob — ne pas
 > le saisir à la main en production.
+
+**`ADMIN_PASSWORD` est obligatoire, sans valeur de repli.** Si elle manque,
+`/emma` et les uploads répondent `503` au lieu de laisser passer. C'est délibéré :
+ce mot de passe autorise aussi l'émission des jetons d'upload Blob, et un défaut
+connu dans un repo public n'aurait protégé personne.
+
+Si `ADMIN_PASSWORD` est définie mais que le store Blob n'existe pas encore,
+l'enregistrement et l'upload renvoient un `503` qui le dit explicitement — faire
+l'étape 2 avant l'étape 3 évite ce cas.
 
 ### 4. Déployer
 - **Deploy.** Une fois en ligne, vérifier `https://<projet>.vercel.app` puis
