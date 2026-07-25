@@ -1438,8 +1438,6 @@
 
     <script>
         const CONFIG_KEY = 'ordutemps_config_v2';
-        const PASS_KEY = 'ordutemps_pass';
-        const DEFAULT_PASS = 'ordutemps2026';
 
         // Mot de passe de session (non persisté, effacé au rechargement)
         let _sessionPwd = null;
@@ -1597,33 +1595,46 @@
         }
 
         // ── Auth ────────────────────────────────────────────────────────
-        function getStoredPass() {
-            return localStorage.getItem(PASS_KEY) || DEFAULT_PASS;
-        }
+        // Le mot de passe n'est jamais stocké côté navigateur : il vit le temps
+        // de la session (_sessionPwd) et c'est le serveur qui fait foi
+        // (ADMIN_PASSWORD, voir lib/storage.js).
 
         document.getElementById('login-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const input = document.getElementById('pwd-input');
-            // Vérification du mot de passe via le serveur
+            const errEl = document.getElementById('login-error');
+
+            function refuse(message) {
+                errEl.textContent = message;
+                errEl.classList.add('visible');
+                input.classList.add('shake');
+                input.value = '';
+                setTimeout(() => input.classList.remove('shake'), 400);
+            }
+
+            // Le serveur fait foi. On n'entre que sur un 200 explicite : toute
+            // autre réponse (401, 503 si ADMIN_PASSWORD manque, erreur réseau)
+            // refuse l'accès plutôt que de laisser passer.
+            let check;
             try {
-                const res = await fetch('/api/config', {
-                    headers: { 'X-Admin-Password': input.value }
-                });
-                // On teste l'auth en tentant un GET protégé (le GET /api/config n'est pas protégé,
-                // donc on utilise un POST vide pour vérifier)
-                const check = await fetch('/api/admin/check', {
+                check = await fetch('/api/admin/check', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Admin-Password': input.value },
                     body: JSON.stringify({})
                 });
-                if (check.status === 401) {
-                    input.classList.add('shake');
-                    document.getElementById('login-error').classList.add('visible');
-                    input.value = '';
-                    setTimeout(() => input.classList.remove('shake'), 400);
-                    return;
-                }
-            } catch { }
+            } catch {
+                refuse('Serveur injoignable. Vérifiez votre connexion.');
+                return;
+            }
+
+            if (!check.ok) {
+                refuse(check.status === 503
+                    ? "L'espace admin n'est pas configuré sur ce déploiement."
+                    : 'Mot de passe incorrect. Réessayez.');
+                return;
+            }
+
+            errEl.classList.remove('visible');
             _sessionPwd = input.value;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').classList.add('visible');

@@ -115,7 +115,10 @@ CALENDLY_URL=https://calendly.com/emma-garcia
 ADMIN_PASSWORD=choisis-un-mot-de-passe-fort   # ← mot de passe espace admin Emma
 ```
 
-> **Important :** change `ADMIN_PASSWORD` — le défaut `ordutemps2026` ne doit jamais rester en production.
+> **Important :** `ADMIN_PASSWORD` est **obligatoire**. Il n'existe plus de mot de passe
+> par défaut : si la variable est absente, l'espace admin et les uploads sont désactivés
+> (réponse `503`). C'est volontaire — ce mot de passe garde aussi l'émission des jetons
+> d'upload, et un défaut connu dans un repo public revient à n'avoir aucune protection.
 
 **Sécuriser le fichier .env :**
 ```bash

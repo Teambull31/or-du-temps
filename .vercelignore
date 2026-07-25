@@ -1,0 +1,17 @@
+# Fichiers inutiles au déploiement Vercel.
+# Sans ça, ils seraient publiés tels quels sur le CDN statique.
+
+# Serveur de dev local uniquement — sur Vercel c'est api/index.js qui sert
+# lib/app.js. Ne pas confondre avec lib/, qui lui est indispensable.
+server.js
+
+# Déploiement VPS historique (jamais utilisé)
+devops/
+.github/
+
+# Documentation interne
+*.md
+
+# Données locales et fichiers de session
+data/
+.remember/
