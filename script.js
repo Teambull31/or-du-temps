@@ -8,6 +8,22 @@
  */
 
 /* ══════════════════════════════════
+   Client Supabase partagé (lecture publique via clé anon).
+   Réutilisé par la page publique et par l'espace admin emma.html.
+══════════════════════════════════ */
+window.odtGetSupabase = function () {
+    if (window.__odtSbClient) return window.__odtSbClient;
+    const S = window.__ODT_SUPABASE__;
+    if (!S || !window.supabase || !window.supabase.createClient) return null;
+    window.__odtSbClient = window.supabase.createClient(S.url, S.anonKey);
+    return window.__odtSbClient;
+};
+
+/* Respect de la préférence système « animations réduites » (accessibilité). */
+const PREFERS_REDUCED_MOTION = !!(window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* ══════════════════════════════════
    0. APPLICATION DE LA CONFIG ADMIN
    Toutes les modifications faites dans emma.html
    sont appliquées ici automatiquement au chargement.
@@ -18,15 +34,35 @@
     const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
     if (Object.keys(cfg).length) _applyConfigData(cfg);
 
-    // Puis synchronisation avec le serveur (source de vérité)
-    fetch('/api/config')
-        .then(r => r.ok ? r.json() : null)
+    // Puis synchronisation avec Supabase (source de vérité, lecture publique)
+    _fetchRemoteConfig()
         .then(serverCfg => {
             if (!serverCfg || !Object.keys(serverCfg).length) return;
             localStorage.setItem('ordutemps_config', JSON.stringify(serverCfg));
             _applyConfigData(serverCfg);
         })
         .catch(() => {});
+
+    // Lecture de la config depuis Supabase (clé anon, RLS en lecture seule).
+    // Repli sur /api/config (serveur Express local) pour le dev sans Supabase.
+    async function _fetchRemoteConfig() {
+        const sb = (window.odtGetSupabase && window.odtGetSupabase());
+        const S  = window.__ODT_SUPABASE__;
+        if (sb && S) {
+            try {
+                const { data, error } = await sb
+                    .from(S.table).select('data').eq('id', 1).maybeSingle();
+                if (!error && data && data.data && Object.keys(data.data).length) {
+                    return data.data;
+                }
+            } catch (e) { /* repli ci-dessous */ }
+        }
+        try {
+            const r = await fetch('/api/config');
+            if (r.ok) return await r.json();
+        } catch (e) { /* hors-ligne : on garde les défauts de config.js */ }
+        return null;
+    }
 
     function _applyConfigData(cfg) {
     if (!Object.keys(cfg).length) return;
@@ -75,7 +111,7 @@
     }
     if (cfg.about_quote) {
         const qEl = document.querySelector('.about-quote span');
-        if (qEl) qEl.textContent = '\u201c' + cfg.about_quote + '\u201d';
+        if (qEl) qEl.textContent = '“' + cfg.about_quote + '”';
     }
 
     // ── Bio Emma ──
@@ -112,13 +148,6 @@
         });
         const visiblePhone = document.querySelector('#contact-telephone a');
         if (visiblePhone) visiblePhone.textContent = cfg.phone;
-    }
-
-    // ── Calendly ──
-    if (cfg.calendly_url) {
-        document.querySelectorAll('[onclick*="CALENDLY_URL"]').forEach(btn => {
-            btn.setAttribute('onclick', "Calendly.initPopupWidget({url:'" + cfg.calendly_url + "'});return false;");
-        });
     }
 
     // ── Adresse ──
@@ -169,16 +198,6 @@
             const cleanNum = waNum.startsWith('0') ? '33' + waNum.slice(1) : waNum;
             waBtn.href = 'https://wa.me/' + cleanNum;
         }
-    }
-
-    // ── Calendly fallback — si pas configuré, les boutons appellent le tel ──
-    if (!cfg.calendly_url) {
-        document.querySelectorAll('[onclick*="CALENDLY_URL"]').forEach(btn => {
-            const phone = (cfg.phone || '0786398886').replace(/\s/g, '');
-            btn.removeAttribute('onclick');
-            btn.style.cursor = 'pointer';
-            btn.addEventListener('click', () => { window.location.href = 'tel:' + phone; });
-        });
     }
 
     // ── Réseaux sociaux ──
@@ -300,8 +319,8 @@
         if (track && nav) {
             track.innerHTML = cfg.testimonials.map(t => `
                 <div class="testimonial-card">
-                    <div class="stars" aria-label="5 \u00e9toiles">\u2605\u2605\u2605\u2605\u2605</div>
-                    <p>\u201c${t.text}\u201d</p>
+                    <div class="stars" aria-label="5 étoiles">★★★★★</div>
+                    <p>“${t.text}”</p>
                     <div class="testimonial-author">
                         <div class="author-avatar" aria-hidden="true">${(t.name || '?').charAt(0)}</div>
                         <div><strong>${t.name}</strong><span>${t.city}</span></div>
@@ -309,7 +328,7 @@
                 </div>
             `).join('');
             nav.innerHTML = cfg.testimonials.map((_, i) => `
-                <button class="t-dot${i === 0 ? ' t-dot--active' : ''}" aria-label="T\u00e9moignage ${i + 1}"></button>
+                <button class="t-dot${i === 0 ? ' t-dot--active' : ''}" aria-label="Témoignage ${i + 1}"></button>
             `).join('');
         }
     }
@@ -440,25 +459,6 @@
 })();
 
 /* ══════════════════════════════════
-   0b. CALENDLY — fallback même sans config
-   (applyConfig retourne tôt si pas de config,
-   ce bloc s'assure que les boutons fonctionnent)
-══════════════════════════════════ */
-(function() {
-    const _saved = localStorage.getItem('ordutemps_config');
-    const cfg = _saved ? JSON.parse(_saved) : (window.__ODT_DEFAULT_CONFIG__ || {});
-    // Si calendly_url est configuré, applyConfig() a déjà mis à jour les onclick
-    if (cfg.calendly_url) return;
-    // Pas de Calendly → redirige vers le numéro de téléphone
-    const phone = (cfg.phone || '0786398886').replace(/\s/g, '');
-    document.querySelectorAll('[onclick*="CALENDLY_URL"]').forEach(btn => {
-        btn.removeAttribute('onclick');
-        btn.style.cursor = 'pointer';
-        btn.addEventListener('click', () => { window.location.href = 'tel:' + phone; });
-    });
-})();
-
-/* ══════════════════════════════════
    1. NAVBAR — Glassmorphism au scroll
 ══════════════════════════════════ */
 const navbar = document.getElementById('navbar');
@@ -534,6 +534,7 @@ if (heroBgImg) {
 function createParticles() {
     const container = document.getElementById('hero-particles');
     if (!container) return;
+    if (PREFERS_REDUCED_MOTION) return; // pas d'animation si l'utilisateur la refuse
 
     const COUNT = 30;
     const SIZES = [1, 1.5, 2, 2.5, 3];
@@ -588,6 +589,7 @@ createParticles();
 
     function startAuto() {
         clearInterval(timer);
+        if (PREFERS_REDUCED_MOTION) return; // pas de défilement auto si animations réduites
         timer = setInterval(() => goTo(current + 1), DELAY);
     }
 
