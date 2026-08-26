@@ -835,6 +835,8 @@
             background: #fff;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
 </head>
 
 <body>
@@ -1036,7 +1038,7 @@
                                 / 160</span>
                         </label>
                         <textarea id="meta_description" class="field-textarea" rows="3"
-                            placeholder="Massages signature, chinois, deep tissue, suédois et thaï..."
+                            placeholder="Institut de massage bien-être à Albi & Toulouse. Massage sur mesure, deep tissue, ayurvédique…"
                             oninput="updateMetaCount(this)"></textarea>
                         <span class="field-help">Idéalement entre 120 et 160 caractères. Apparaît dans les résultats
                             Google.</span>
@@ -1079,53 +1081,39 @@
             <!-- ══ TARIFS ══ -->
             <div id="section-tarifs" class="admin-section">
                 <h2 class="section-title-admin">Tarifs &amp; Soins</h2>
-                <p class="section-desc">Modifiez le prix et la description de chaque soin. Pour le tarif, exemples :
-                    <em>1h30 · 70 €</em>, <em>1h · 50 €</em>, <em>Sur devis</em>.</p>
+                <p class="section-desc">Modifiez le prix et la description de chaque soin. Pour le tarif, indiquez
+                    par exemple <em>75€</em> ou <em>Sur devis</em>.</p>
 
                 <div class="section-block">
-                    <p class="block-title">Massage Signature</p>
+                    <p class="block-title">Massage sur mesure — tarifs par durée</p>
                     <div class="field-group">
-                        <label class="field-label">Tarif affiché</label>
-                        <input type="text" id="prix_signature" class="field-input" placeholder="1h30 · 70 €">
+                        <label class="field-label">Description (soin sur mesure)</label>
+                        <textarea id="desc_sur_mesure" class="field-textarea" rows="3"
+                            placeholder="Soin entièrement personnalisé selon vos besoins du moment..."></textarea>
                     </div>
                     <div class="field-group">
-                        <label class="field-label">Description du soin</label>
-                        <textarea id="desc_signature" class="field-textarea" rows="3"
-                            placeholder="Description du massage signature..."></textarea>
+                        <label class="field-label">1 h 30 min</label>
+                        <input type="text" id="prix_sm_90" class="field-input" placeholder="75€">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">1 heure</label>
+                        <input type="text" id="prix_sm_60" class="field-input" placeholder="60€">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">45 min</label>
+                        <input type="text" id="prix_sm_45" class="field-input" placeholder="55€">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">30 min</label>
+                        <input type="text" id="prix_sm_30" class="field-input" placeholder="50€">
                     </div>
                 </div>
 
                 <div class="section-block">
-                    <p class="block-title">Soin Adolescent</p>
+                    <p class="block-title">Deep tissue (1 h)</p>
                     <div class="field-group">
                         <label class="field-label">Tarif affiché</label>
-                        <input type="text" id="prix_ado" class="field-input" placeholder="1h · 50 €">
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label">Description du soin</label>
-                        <textarea id="desc_ado" class="field-textarea" rows="3"
-                            placeholder="Description du soin adolescent..."></textarea>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <p class="block-title">Massage Chinois</p>
-                    <div class="field-group">
-                        <label class="field-label">Tarif affiché</label>
-                        <input type="text" id="prix_chinois" class="field-input" placeholder="Sur devis">
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label">Description du soin</label>
-                        <textarea id="desc_chinois" class="field-textarea" rows="3"
-                            placeholder="Description du massage chinois..."></textarea>
-                    </div>
-                </div>
-
-                <div class="section-block">
-                    <p class="block-title">Deep Tissue</p>
-                    <div class="field-group">
-                        <label class="field-label">Tarif affiché</label>
-                        <input type="text" id="prix_deep" class="field-input" placeholder="Sur devis">
+                        <input type="text" id="prix_deep" class="field-input" placeholder="75€">
                     </div>
                     <div class="field-group">
                         <label class="field-label">Description du soin</label>
@@ -1135,37 +1123,54 @@
                 </div>
 
                 <div class="section-block">
-                    <p class="block-title">Massage Suédois</p>
+                    <p class="block-title">Ayurvédique (1 h)</p>
                     <div class="field-group">
                         <label class="field-label">Tarif affiché</label>
-                        <input type="text" id="prix_suedois" class="field-input" placeholder="Sur devis">
+                        <input type="text" id="prix_ayurvedique" class="field-input" placeholder="75€">
                     </div>
                     <div class="field-group">
                         <label class="field-label">Description du soin</label>
-                        <textarea id="desc_suedois" class="field-textarea" rows="3"
-                            placeholder="Description du massage suédois..."></textarea>
+                        <textarea id="desc_ayurvedique" class="field-textarea" rows="3"
+                            placeholder="Description du massage ayurvédique..."></textarea>
                     </div>
                 </div>
 
                 <div class="section-block">
-                    <p class="block-title">Massage Thaï</p>
+                    <p class="block-title">Thaïlandais (1 h)</p>
                     <div class="field-group">
                         <label class="field-label">Tarif affiché</label>
-                        <input type="text" id="prix_thai" class="field-input" placeholder="Sur devis">
+                        <input type="text" id="prix_thai" class="field-input" placeholder="75€">
                     </div>
                     <div class="field-group">
                         <label class="field-label">Description du soin</label>
                         <textarea id="desc_thai" class="field-textarea" rows="3"
-                            placeholder="Description du massage thaï..."></textarea>
+                            placeholder="Description du massage thaïlandais..."></textarea>
                     </div>
                 </div>
 
                 <div class="section-block">
-                    <p class="block-title">Bandeau récapitulatif des tarifs adultes</p>
+                    <p class="block-title">Kobido (1 h)</p>
                     <div class="field-group">
-                        <label class="field-label">Texte du bandeau en bas de la section soins</label>
-                        <input type="text" id="prix_banner" class="field-input" placeholder="1h30 – 70 € | 2h – 90 €">
-                        <span class="field-help">Séparez les durées avec un | : 1h30 – 70 € | 2h – 90 €</span>
+                        <label class="field-label">Tarif affiché</label>
+                        <input type="text" id="prix_kobido" class="field-input" placeholder="75€">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Description du soin</label>
+                        <textarea id="desc_kobido" class="field-textarea" rows="3"
+                            placeholder="Description du kobido..."></textarea>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <p class="block-title">Drainage lymphatique (1 h)</p>
+                    <div class="field-group">
+                        <label class="field-label">Tarif affiché</label>
+                        <input type="text" id="prix_drainage" class="field-input" placeholder="70€">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Description du soin</label>
+                        <textarea id="desc_drainage" class="field-textarea" rows="3"
+                            placeholder="Description du drainage lymphatique..."></textarea>
                     </div>
                 </div>
             </div>
@@ -1245,16 +1250,6 @@
                     </div>
                 </div>
 
-                <div class="section-block">
-                    <p class="block-title">Réservation en ligne — Calendly</p>
-                    <div class="field-group">
-                        <label class="field-label">Votre lien Calendly</label>
-                        <input type="url" id="calendly_url" class="field-input"
-                            placeholder="https://calendly.com/votre-identifiant">
-                        <span class="field-help">Si vous n'avez pas de Calendly, laissez vide — les boutons de
-                            réservation appelleront votre numéro.</span>
-                    </div>
-                </div>
 
                 <div class="section-block">
                     <p class="block-title">Réseaux sociaux</p>
@@ -1366,8 +1361,8 @@
                 <div class="section-block">
                     <p class="block-title">Changer le mot de passe</p>
                     <div class="security-info">
-                        Le mot de passe par défaut est <strong>ordutemps2026</strong>. Changez-le dès que possible et
-                        notez le nouveau quelque part en cas d'oubli.
+                        Vous vous connectez avec le mot de passe qui vous a été communiqué. Changez-le dès que possible
+                        et notez le nouveau quelque part en cas d'oubli. Il sera mis à jour partout instantanément.
                     </div>
                     <div class="field-group">
                         <label class="field-label">Nouveau mot de passe</label>
@@ -1441,11 +1436,17 @@
 
     <script>
         const CONFIG_KEY = 'ordutemps_config';
-        const PASS_KEY = 'ordutemps_pass';
-        const DEFAULT_PASS = 'ordutemps2026';
 
-        // Mot de passe de session (non persisté, effacé au rechargement)
-        let _sessionPwd = null;
+        // ── Client Supabase (source de vérité : contenu + médias + auth) ──
+        const SB_CFG = window.__ODT_SUPABASE__ || {};
+        const ADMIN_EMAIL = 'emma@ordutemps.fr';
+        let _sb = null;
+        function sb() {
+            if (_sb) return _sb;
+            if (!window.supabase || !SB_CFG.url) return null;
+            _sb = window.supabase.createClient(SB_CFG.url, SB_CFG.anonKey);
+            return _sb;
+        }
 
         // ── Ctrl+S / Cmd+S pour sauvegarder ──
         document.addEventListener('keydown', e => {
@@ -1509,30 +1510,31 @@
                 stat2_label: 'Villes — Albi & Toulouse',
                 stat3_number: '7j/7',
                 stat3_label: 'Disponible pour vous',
-                prix_signature: '1h30 · 70 €',
-                prix_chinois: 'Sur devis',
-                prix_deep: 'Sur devis',
-                prix_suedois: 'Sur devis',
-                prix_thai: 'Sur devis',
-                prix_ado: '1h · 50 €',
-                prix_banner: '1h30 – 70 € | 2h – 90 €',
-                desc_signature: 'Notre création exclusive. Un voyage en plusieurs étapes mêlant effleurages doux, pressions profondes et étirements pour une relaxation absolue.',
-                desc_chinois: 'Énergétique et tonique, ce massage ancestral travaille sur les méridiens pour rééquilibrer le flux vital et libérer les blocages.',
-                desc_deep: 'Ciblant les couches profondes du tissu musculaire, ce massage libère les tensions chroniques et soulage douleurs et raideurs persistantes.',
-                desc_suedois: 'Le classique par excellence. Long effleurages glissés pour apaiser le système nerveux, améliorer la circulation et dissoudre le stress.',
-                desc_thai: 'Pratiqué sur tapis, ce massage dynamique associe pressions rythmées et étirements profonds pour retrouver souplesse et énergie vitale.',
-                desc_ado: 'Spécialement adapté aux 11–18 ans. Un moment doux pour apprendre à écouter son corps et se (re)connecter à soi-même.',
+                prix_sm_90: '75€',
+                prix_sm_60: '60€',
+                prix_sm_45: '55€',
+                prix_sm_30: '50€',
+                desc_sur_mesure: 'Soin entièrement personnalisé selon vos besoins du moment — techniques, zones travaillées et pression adaptées à votre ressenti.',
+                prix_deep: '75€',
+                desc_deep: 'Libère les tensions musculaires profondes, soulage les douleurs et raideurs chroniques.',
+                prix_ayurvedique: '75€',
+                desc_ayurvedique: "Rééquilibre l'énergie vitale, apaise le système nerveux et favorise la détoxification.",
+                prix_thai: '75€',
+                desc_thai: 'Améliore la souplesse et la circulation via étirements profonds et pressions rythmées.',
+                prix_kobido: '75€',
+                desc_kobido: 'Tonifie les muscles du visage, lisse les traits et redonne éclat — lifting naturel anti-âge.',
+                prix_drainage: '70€',
+                desc_drainage: "Élimine toxines et rétention d'eau, réduit les gonflements et booste les défenses naturelles.",
                 phone: '07 86 39 88 86',
-                calendly_url: '',
                 adresse: 'Rue de Fargues\n81000 Albi',
                 adresse_extra: '+ disponibilités à Toulouse',
                 horaires: 'Lun – Sam : 9h – 21h\nDim : 10h – 21h',
                 testimonials: [
-                    { text: 'Une heure et demie de pure félicité. Le massage signature est absolument envoûtant — on repart transformé, le corps léger et l\'esprit apaisé.', name: 'Marie L.', city: 'Albi' },
+                    { text: 'Une heure et demie de pure félicité. Le massage sur mesure est absolument envoûtant — on repart transformé, le corps léger et l\'esprit apaisé.', name: 'Marie L.', city: 'Albi' },
                     { text: 'J\'avais des douleurs chroniques aux épaules depuis des mois. Après un Deep Tissue, j\'ai retrouvé une mobilité que je croyais perdue. Bluffant.', name: 'Thomas R.', city: 'Toulouse' },
                     { text: 'Un cadre chaleureux, une praticienne à l\'écoute et un moment hors du temps. J\'y emmène maintenant toute ma famille. Un vrai sanctuaire.', name: 'Sophie D.', city: 'Albi' },
                 ],
-                meta_description: 'Massages signature, chinois, deep tissue, suédois et thaï. Une parenthèse hors du temps à Albi & Toulouse avec Emma Garcia, praticienne certifiée.',
+                meta_description: 'Institut de massage bien-être à Albi & Toulouse. Massage sur mesure, deep tissue, ayurvédique, thaïlandais, kobido et drainage lymphatique avec Emma Garcia, praticienne certifiée. Une parenthèse hors du temps.',
                 ga_id: '',
                 instagram: '',
                 facebook: '',
@@ -1561,7 +1563,7 @@
                     { q: "Combien de temps à l'avance faut-il réserver ?", a: "Idéalement 24 à 48h à l'avance. Emma essaie d'accommoder les demandes de dernière minute selon ses disponibilités — n'hésitez pas à appeler directement." },
                     { q: 'Y a-t-il des contre-indications ?', a: 'Certains soins sont déconseillés en cas de grossesse, fièvre, blessure récente ou problème cardiovasculaire. Signalez toujours votre état de santé — Emma adaptera le soin en conséquence.' },
                     { q: 'Proposez-vous des séances à domicile ?', a: 'Oui, Emma se déplace sur Albi et Toulouse sous certaines conditions. Contactez-la directement pour discuter des modalités et disponibilités.' },
-                    { q: 'Quelle durée pour une première séance ?', a: "Nous recommandons 1h30 avec le massage signature. Cette durée permet à Emma de bien vous connaître et de vous offrir une expérience complète et ressourçante." },
+                    { q: 'Quelle durée pour une première séance ?', a: "Nous recommandons 1h30 avec le massage sur mesure. Cette durée permet à Emma de bien vous connaître et de vous offrir une expérience complète et ressourçante." },
                 ],
             };
         }
@@ -1572,48 +1574,51 @@
                 'hero_eyebrow', 'hero_subtitle', 'about_text', 'about_quote',
                 'emma_bio', 'emma_value1', 'emma_value2', 'emma_value3',
                 'stat1_number', 'stat1_label', 'stat2_number', 'stat2_label', 'stat3_number', 'stat3_label',
-                'prix_signature', 'prix_chinois', 'prix_deep', 'prix_suedois', 'prix_thai', 'prix_ado', 'prix_banner',
-                'desc_signature', 'desc_chinois', 'desc_deep', 'desc_suedois', 'desc_thai', 'desc_ado',
-                'phone', 'calendly_url', 'adresse', 'adresse_extra', 'horaires',
+                'prix_sm_90', 'prix_sm_60', 'prix_sm_45', 'prix_sm_30', 'desc_sur_mesure',
+                'prix_deep', 'desc_deep', 'prix_ayurvedique', 'desc_ayurvedique',
+                'prix_thai', 'desc_thai', 'prix_kobido', 'desc_kobido', 'prix_drainage', 'desc_drainage',
+                'phone', 'adresse', 'adresse_extra', 'horaires',
                 'meta_description', 'ga_id', 'instagram', 'facebook', 'tiktok', 'whatsapp_enabled', 'whatsapp_number', 'gmb_url', 'map_url', 'formspree_id',
                 'gift_amount1', 'gift_amount2', 'gift_amount3',
                 'google_rating', 'google_review_count',
             ];
         }
 
-        // ── Auth ────────────────────────────────────────────────────────
-        function getStoredPass() {
-            return localStorage.getItem(PASS_KEY) || DEFAULT_PASS;
-        }
-
+        // ── Auth (Supabase) ──────────────────────────────────────────────
         document.getElementById('login-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const input = document.getElementById('pwd-input');
-            // Vérification du mot de passe via le serveur
-            try {
-                const res = await fetch('/api/config', {
-                    headers: { 'X-Admin-Password': input.value }
-                });
-                // On teste l'auth en tentant un GET protégé (le GET /api/config n'est pas protégé,
-                // donc on utilise un POST vide pour vérifier)
-                const check = await fetch('/api/admin/check', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': input.value },
-                    body: JSON.stringify({})
-                });
-                if (check.status === 401) {
-                    input.classList.add('shake');
-                    document.getElementById('login-error').classList.add('visible');
-                    input.value = '';
-                    setTimeout(() => input.classList.remove('shake'), 400);
-                    return;
-                }
-            } catch { }
-            _sessionPwd = input.value;
+            const errEl = document.getElementById('login-error');
+            const fail = (msg) => {
+                input.classList.add('shake');
+                if (msg && errEl) errEl.textContent = msg;
+                if (errEl) errEl.classList.add('visible');
+                input.value = '';
+                setTimeout(() => input.classList.remove('shake'), 400);
+            };
+            const client = sb();
+            if (!client) { fail('Connexion au serveur impossible. Réessayez.'); return; }
+            const { error } = await client.auth.signInWithPassword({
+                email: ADMIN_EMAIL, password: input.value
+            });
+            if (error) { fail('Mot de passe incorrect.'); return; }
+            if (errEl) errEl.classList.remove('visible');
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('admin-panel').classList.add('visible');
             loadConfig();
         });
+
+        // Reprend automatiquement une session déjà ouverte (rafraîchissement de page)
+        (async function () {
+            const client = sb();
+            if (!client) return;
+            const { data } = await client.auth.getSession();
+            if (data && data.session) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').classList.add('visible');
+                loadConfig();
+            }
+        })();
 
         function publishConfig() {
             const raw = localStorage.getItem('ordutemps_config');
@@ -1630,8 +1635,10 @@
             showToast('config.js téléchargé ! Committez-le dans git pour publier.');
         }
 
-        function logout() {
+        async function logout() {
             if (!confirm('Se déconnecter de l\'espace admin ?')) return;
+            const client = sb();
+            if (client) { try { await client.auth.signOut(); } catch { } }
             window.location.reload();
         }
 
@@ -1647,15 +1654,19 @@
         // ── Chargement ──────────────────────────────────────────────────
         async function loadConfig() {
             let saved = {};
-            try {
-                const res = await fetch('/api/config');
-                if (res.ok) {
-                    saved = await res.json();
-                    // Mise en cache locale pour les rechargements rapides
-                    localStorage.setItem(CONFIG_KEY, JSON.stringify(saved));
-                }
-            } catch {
-                // Fallback : utiliser le cache localStorage si le serveur est inaccessible
+            const client = sb();
+            if (client) {
+                try {
+                    const { data, error } = await client
+                        .from(SB_CFG.table).select('data').eq('id', 1).maybeSingle();
+                    if (!error && data && data.data && Object.keys(data.data).length) {
+                        saved = data.data;
+                        localStorage.setItem(CONFIG_KEY, JSON.stringify(saved));
+                    }
+                } catch { /* repli ci-dessous */ }
+            }
+            if (!Object.keys(saved).length) {
+                // Repli : cache local, sinon les valeurs par défaut s'appliqueront champ par champ
                 saved = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
             }
             const defaults = getDefaults();
@@ -1704,21 +1715,17 @@
             cfg.faq_items = JSON.parse(JSON.stringify(faqData));
             cfg.whatsapp_enabled = document.getElementById('whatsapp_enabled')?.value !== 'false';
 
+            const client = sb();
+            if (!client) { showToast('⚠️ Connexion au serveur impossible.', true); return; }
             try {
-                const res = await fetch('/api/config', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': _sessionPwd || ''
-                    },
-                    body: JSON.stringify(cfg)
-                });
-                if (!res.ok) {
-                    const err = await res.json();
-                    showToast('⚠️ ' + (err.error || 'Erreur serveur.'), true);
+                const { error } = await client
+                    .from(SB_CFG.table)
+                    .upsert({ id: 1, data: cfg, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+                if (error) {
+                    showToast('⚠️ ' + (error.message || 'Erreur d\'enregistrement.'), true);
                     return;
                 }
-            } catch {
+            } catch (e) {
                 showToast('⚠️ Impossible de joindre le serveur.', true);
                 return;
             }
@@ -1727,7 +1734,7 @@
             localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
             saveToHistory(cfg);
             markClean();
-            showToast('✓ Modifications enregistrées !');
+            showToast('✓ Modifications enregistrées et publiées !');
         }
 
         // ── Photos ──────────────────────────────────────────────────────
@@ -1739,41 +1746,40 @@
             prev.style.opacity = val ? '1' : '.2';
         }
 
+        // Upload d'un fichier (image ou vidéo) vers Supabase Storage.
+        // Le navigateur envoie directement au stockage (pas de limite serverless),
+        // renvoie l'URL publique du média.
+        async function uploadToStorage(file, folder) {
+            const client = sb();
+            if (!client) throw new Error('Connexion au serveur impossible.');
+            const safeExt = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const rand = (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : Date.now() + '-' + Math.random().toString(16).slice(2);
+            const path = folder + '/' + rand + '.' + safeExt;
+            const { error } = await client.storage.from(SB_CFG.bucket).upload(path, file, {
+                cacheControl: '31536000', upsert: true, contentType: file.type || undefined
+            });
+            if (error) throw error;
+            const { data } = client.storage.from(SB_CFG.bucket).getPublicUrl(path);
+            return data.publicUrl;
+        }
+
         function handleUpload(inputId, previewId, fileInput) {
             const file = fileInput.files[0];
             if (!file) return;
-            if (file.size > 4 * 1024 * 1024) {
-                showToast('⚠️ Image trop grande (max 4 Mo). Compressez-la d\'abord.', true);
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('⚠️ Image trop grande (max 10 Mo). Compressez-la d\'abord.', true);
                 return;
             }
-            const ext = file.name.split('.').pop() || 'jpg';
-            const reader = new FileReader();
-            reader.onload = async function (e) {
-                // Extraire le base64 pur (sans le préfixe "data:image/...;base64,")
-                const base64 = e.target.result.split(',')[1];
-                showToast('Envoi en cours…', false);
-                try {
-                    const res = await fetch('/api/upload', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Admin-Password': _sessionPwd || ''
-                        },
-                        body: JSON.stringify({ data: base64, ext })
-                    });
-                    if (!res.ok) {
-                        showToast('⚠️ Erreur lors de l\'upload.', true);
-                        return;
-                    }
-                    const { url } = await res.json();
-                    document.getElementById(inputId).value = url;
-                    updatePreview(inputId, previewId);
-                    showToast('Image uploadée ! Cliquez sur Enregistrer.', false);
-                } catch {
-                    showToast('⚠️ Impossible de joindre le serveur.', true);
-                }
-            };
-            reader.readAsDataURL(file);
+            showToast('Envoi en cours…', false);
+            uploadToStorage(file, 'images').then(url => {
+                document.getElementById(inputId).value = url;
+                updatePreview(inputId, previewId);
+                showToast('Image envoyée ! Cliquez sur Enregistrer.', false);
+            }).catch(err => {
+                showToast('⚠️ ' + (err.message || 'Erreur lors de l\'envoi.'), true);
+            });
         }
 
         // ── Témoignages ─────────────────────────────────────────────────
@@ -1837,32 +1843,22 @@
             if (newPwd.length < 6) { fb.textContent = 'Le mot de passe doit contenir au moins 6 caractères.'; fb.className = 'feedback-msg error'; return; }
             if (newPwd !== confirm) { fb.textContent = 'Les deux mots de passe ne correspondent pas.'; fb.className = 'feedback-msg error'; return; }
 
-            try {
-                const res = await fetch('/api/admin/password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': _sessionPwd || ''
-                    },
-                    body: JSON.stringify({ newPassword: newPwd })
-                });
-                if (!res.ok) {
-                    const err = await res.json();
-                    fb.textContent = err.error || 'Erreur serveur.';
-                    fb.className = 'feedback-msg error';
-                    return;
-                }
-            } catch {
-                fb.textContent = 'Impossible de joindre le serveur.';
+            const client = sb();
+            if (!client) {
+                fb.textContent = 'Connexion au serveur impossible.';
+                fb.className = 'feedback-msg error';
+                return;
+            }
+            const { error } = await client.auth.updateUser({ password: newPwd });
+            if (error) {
+                fb.textContent = error.message || 'Erreur lors de la mise à jour.';
                 fb.className = 'feedback-msg error';
                 return;
             }
 
-            // Mettre à jour le mot de passe de session
-            _sessionPwd = newPwd;
             document.getElementById('new-pwd').value = '';
             document.getElementById('confirm-pwd').value = '';
-            fb.textContent = '✓ Mot de passe mis à jour sur le serveur.';
+            fb.textContent = '✓ Mot de passe mis à jour.';
             fb.className = 'feedback-msg success';
             setTimeout(() => { fb.textContent = ''; }, 4000);
         }
@@ -1890,15 +1886,11 @@
                 try {
                     const cfg = JSON.parse(e.target.result);
                     if (!confirm('Êtes-vous sûr de vouloir restaurer cette sauvegarde ? Vos modifications actuelles seront remplacées.')) return;
-                    const res = await fetch('/api/config', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Admin-Password': _sessionPwd || ''
-                        },
-                        body: JSON.stringify(cfg)
-                    });
-                    if (!res.ok) { throw new Error('server'); }
+                    const client = sb();
+                    if (!client) throw new Error('server');
+                    const { error } = await client.from(SB_CFG.table)
+                        .upsert({ id: 1, data: cfg, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+                    if (error) throw error;
                     localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
                     loadConfig();
                     fb.textContent = '✓ Sauvegarde restaurée avec succès.';
@@ -1916,16 +1908,13 @@
         // ── Réinitialisation ──────────────────────────────────────────────
         async function resetConfig() {
             if (!confirm('Remettre tout à zéro ? Cette action est irréversible.\n\nConseil : téléchargez d\'abord une sauvegarde via le bouton "Télécharger ma sauvegarde".')) return;
-            try {
-                await fetch('/api/config', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': _sessionPwd || ''
-                    },
-                    body: JSON.stringify({})
-                });
-            } catch { }
+            const client = sb();
+            if (client) {
+                try {
+                    await client.from(SB_CFG.table)
+                        .upsert({ id: 1, data: {}, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+                } catch { }
+            }
             localStorage.removeItem(CONFIG_KEY);
             loadConfig();
             showToast('Site réinitialisé aux valeurs d\'origine.');
@@ -2318,28 +2307,28 @@
         function handleGalleryUpload(i, fileInput) {
             const file = fileInput.files[0];
             if (!file) return;
-            if (file.size > 4 * 1024 * 1024) { showToast('⚠️ Image trop grande (max 4 Mo)', true); return; }
-            const reader = new FileReader();
-            reader.onload = e => {
+            if (file.size > 10 * 1024 * 1024) { showToast('⚠️ Image trop grande (max 10 Mo)', true); return; }
+            showToast('Envoi en cours…', false);
+            uploadToStorage(file, 'gallery').then(url => {
                 const srcInput = document.querySelector(`.gallery-src[data-index="${i}"]`);
-                if (srcInput) { srcInput.value = e.target.result; updateGalleryPreview(i, srcInput); }
-                showToast('Image chargée ! Cliquez sur Enregistrer.');
-            };
-            reader.readAsDataURL(file);
+                if (srcInput) { srcInput.value = url; updateGalleryPreview(i, srcInput); }
+                showToast('Image envoyée ! Cliquez sur Enregistrer.');
+            }).catch(err => showToast('⚠️ ' + (err.message || 'Erreur lors de l\'envoi.'), true));
         }
 
         function handleGalleryVideoUpload(i, fileInput) {
             const file = fileInput.files[0];
             if (!file) return;
-            if (file.size > 50 * 1024 * 1024) { showToast('⚠️ Vidéo trop grande (max 50 Mo)', true); return; }
-            const key = 'gallery_video_' + i + '_' + Date.now();
-            storeVideoDB(key, file).then(() => {
+            if (file.size > 200 * 1024 * 1024) { showToast('⚠️ Vidéo trop grande (max 200 Mo)', true); return; }
+            showToast('Envoi de la vidéo… cela peut prendre un moment.', false);
+            // Upload direct vers Supabase Storage → URL publique lue par tous les visiteurs.
+            uploadToStorage(file, 'videos').then(url => {
                 const imgs = getCurrentGalleryImages();
-                imgs[i] = { type: 'video', videoKey: key, alt: imgs[i]?.alt || '' };
+                imgs[i] = { type: 'video-url', src: url, alt: imgs[i]?.alt || '' };
                 renderGalleryAdmin(imgs);
                 markDirty();
-                showToast('Vidéo chargée ! Cliquez sur Enregistrer.');
-            }).catch(() => showToast('⚠️ Erreur lors du chargement', true));
+                showToast('Vidéo envoyée ! Cliquez sur Enregistrer.');
+            }).catch(err => showToast('⚠️ ' + (err.message || 'Erreur lors de l\'envoi.'), true));
         }
 
         function removeGalleryVideo(i) {
