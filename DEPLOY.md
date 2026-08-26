@@ -1,268 +1,78 @@
-# Déploiement Or du Temps — Guide VPS (Ubuntu 22.04)
+# Déploiement — Or du Temps (Vercel + Supabase)
 
-## Prérequis
-- Un VPS Ubuntu 22.04 (OVH, Infomaniak, Hetzner...)
-- Un nom de domaine pointant vers l'IP de ton VPS
-- Accès root SSH
+Le site est **100 % statique** et se déploie sur **Vercel**. Tout le contenu modifiable
+par Emma (textes, photos, vidéos, tarifs, avis, FAQ…) est stocké dans **Supabase**
+(base de données + stockage de fichiers). Aucun serveur à maintenir.
 
----
-
-## Étape 1 — Connexion et mise à jour du serveur
-
-```bash
-ssh root@<IP_VPS>
-apt update && apt upgrade -y
+```
+Navigateur ─┬─► Vercel (HTML/CSS/JS statiques)
+            ├─► Supabase  ├─ table  ordutemps_site_config  (contenu du site)
+            │             └─ bucket ordutemps-media        (images + vidéos)
+            └─► Formspree (formulaire de contact, optionnel)
 ```
 
----
-
-## Étape 2 — Créer un utilisateur non-root
-
-```bash
-adduser emma
-usermod -aG sudo emma
-
-# Copier ta clé SSH vers le nouvel utilisateur
-rsync --archive --chown=emma:emma ~/.ssh /home/emma
-```
-
-Se reconnecter avec le nouvel utilisateur pour la suite :
-```bash
-ssh emma@<IP_VPS>
-```
-
----
-
-## Étape 3 — Installer Node.js 20 (LTS)
-
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-node -v   # doit afficher v20.x.x
-npm -v
-```
-
----
-
-## Étape 4 — Installer PM2 (gestionnaire de processus)
-
-```bash
-sudo npm install -g pm2
-```
-
----
-
-## Étape 5 — Installer Nginx (reverse proxy)
-
-```bash
-sudo apt install -y nginx
-sudo systemctl enable nginx
-sudo systemctl start nginx
-```
-
----
-
-## Étape 6 — Configurer le pare-feu (UFW)
-
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
-sudo ufw enable
-sudo ufw status
-```
-
----
-
-## Étape 7 — Déployer le site
-
-### Option A — Cloner depuis GitHub
-
-```bash
-cd /var/www
-sudo git clone https://github.com/Teambull31/or-du-temps.git ordutemps
-sudo chown -R emma:emma /var/www/ordutemps
-cd /var/www/ordutemps
-git checkout main   # ou la branche souhaitée
-npm install --omit=dev
-```
-
-### Option B — Uploader les fichiers via SFTP
-
-Depuis ton ordinateur (FileZilla, Cyberduck, ou scp) :
-```bash
-scp -r /chemin/local/or-du-temps emma@<IP_VPS>:/var/www/ordutemps
-```
-
----
-
-## Étape 8 — Configurer les variables d'environnement
-
-```bash
-cd /var/www/ordutemps
-cp .env.example .env
-nano .env
-```
-
-Remplir les valeurs :
-```
-PORT=3000
-SMTP_HOST=smtp.example.com       # ex: ssl0.ovh.net pour OVH
-SMTP_PORT=587
-EMAIL_USER=contact@ordutemps.fr
-EMAIL_PASS=ton-mot-de-passe-smtp
-EMAIL_TO=contact@ordutemps.fr
-CALENDLY_URL=https://calendly.com/emma-garcia
-ADMIN_PASSWORD=choisis-un-mot-de-passe-fort   # ← mot de passe espace admin Emma
-```
-
-> **Important :** change `ADMIN_PASSWORD` — le défaut `ordutemps2026` ne doit jamais rester en production.
-
-**Sécuriser le fichier .env :**
-```bash
-chmod 600 .env
-```
-
----
-
-## Étape 9 — Démarrer l'application avec PM2
-
-```bash
-cd /var/www/ordutemps
-pm2 start server.js --name "ordutemps"
-pm2 save
-pm2 startup   # suivre la commande affichée pour l'autostart au reboot
-```
-
-Vérifier que ça tourne :
-```bash
-pm2 status
-pm2 logs ordutemps
-```
-
----
-
-## Étape 10 — Configurer Nginx comme reverse proxy
-
-```bash
-sudo nano /etc/nginx/sites-available/ordutemps
-```
-
-Coller cette configuration (remplacer `ordutemps.fr` par ton domaine) :
-
-```nginx
-server {
-    listen 80;
-    server_name ordutemps.fr www.ordutemps.fr;
-
-    # Nécessaire pour l'upload de photos depuis l'espace admin (jusqu'à 4 Mo)
-    client_max_body_size 10m;
-
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-Activer le site et recharger Nginx :
-```bash
-sudo ln -s /etc/nginx/sites-available/ordutemps /etc/nginx/sites-enabled/
-sudo nginx -t        # vérifier la config (doit afficher "ok")
-sudo systemctl reload nginx
-```
-
----
-
-## Étape 11 — Certificat SSL gratuit (HTTPS) avec Let's Encrypt
-
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d ordutemps.fr -d www.ordutemps.fr
-```
-
-Suivre les instructions (entrer l'email, accepter les CGU).
-
-Certbot modifie automatiquement la config Nginx pour le HTTPS.
-
-**Renouvellement automatique** (déjà configuré par certbot, vérifier) :
-```bash
-sudo systemctl status certbot.timer
-# ou tester manuellement :
-sudo certbot renew --dry-run
-```
-
----
-
-## Étape 12 — Vérification finale
-
-```bash
-# Le serveur Node tourne
-pm2 status
-
-# Nginx est actif
-sudo systemctl status nginx
-
-# Le site répond
-curl -I https://ordutemps.fr
-```
-
-Ouvrir dans le navigateur :
-- `https://ordutemps.fr` → page d'accueil
-- `https://ordutemps.fr/mentions-legales.html` → mentions légales
-- `https://ordutemps.fr/robots.txt` → robots.txt
-- `https://ordutemps.fr/sitemap.xml` → sitemap
-
----
-
-## Commandes utiles au quotidien
-
-```bash
-# Voir les logs en temps réel
-pm2 logs ordutemps
-
-# Redémarrer l'app après une mise à jour
-pm2 restart ordutemps
-
-# Mettre à jour le site depuis git
-cd /var/www/ordutemps
-git pull origin main
-npm install --omit=dev
-pm2 restart ordutemps
-
-# Recharger Nginx
-sudo systemctl reload nginx
-
-# Statut général
-pm2 status && sudo systemctl status nginx
-```
-
----
-
-## DNS — Configuration chez ton registrar
-
-Dans l'interface de gestion de ton nom de domaine, ajouter :
-
-| Type | Nom | Valeur | TTL |
-|------|-----|--------|-----|
-| A | @ | `<IP_VPS>` | 3600 |
-| A | www | `<IP_VPS>` | 3600 |
-
-> Propagation DNS : 15 min à 48h selon les registrars.
-
----
-
-## Fournisseurs SMTP recommandés (pour l'envoi d'emails)
-
-| Fournisseur | Gratuit | Notes |
-|-------------|---------|-------|
-| **OVH / email pro** | Inclus avec le domaine | SMTP : `ssl0.ovh.net`, port 465/587 |
-| **Brevo (ex-Sendinblue)** | 300 emails/jour | Fiable, bonne délivrabilité |
-| **Gmail SMTP** | Oui (500/jour) | Nécessite un "mot de passe d'application" |
-| **Postmark** | 100/mois gratuit | Excellent pour la délivrabilité |
+## 1. Déployer sur Vercel
+
+1. Aller sur https://vercel.com → **Add New… → Project**.
+2. Importer le dépôt GitHub `teambull31/or-du-temps`.
+3. **Framework Preset : Other**. Laisser *Build Command* et *Output Directory* vides
+   (le `vercel.json` + `.vercelignore` fournis configurent le reste).
+4. **Deploy**. Le site est en ligne en ~30 s.
+5. (Optionnel) **Settings → Domains** : brancher `ordutemps.fr`.
+
+Aucune variable d'environnement n'est nécessaire : les clés Supabase publiques
+(lecture seule) sont dans `supabase-config.js` et protégées par les règles RLS.
+
+Chaque `git push` sur la branche de production redéploie automatiquement.
+
+## 2. Le backend Supabase (déjà en place)
+
+- **Projet** : `or-du-temps` — ref `pjehjrqlgyozxeatxkjc` (région Paris).
+- **Table** `public.ordutemps_site_config` : une ligne (`id = 1`, colonne `data` JSONB)
+  contenant toute la configuration du site. Lecture publique, écriture réservée à Emma.
+- **Bucket** `ordutemps-media` : images et vidéos téléversées depuis l'admin (public en
+  lecture). Limite 200 Mo/fichier.
+- **Compte admin** : `emma@ordutemps.fr` (mot de passe communiqué séparément — à changer
+  à la première connexion via l'onglet **Sécurité** de l'admin).
+
+Les règles RLS n'autorisent l'écriture (contenu + upload) qu'à l'utilisateur d'Emma.
+Les clés publiques ne permettent que la lecture.
+
+## 3. L'espace d'administration d'Emma
+
+- URL : `https://<votre-domaine>/emma`
+- Connexion avec le mot de passe. Emma peut modifier, **même depuis son téléphone** :
+  **Photos** (upload direct), **Textes**, **Tarifs & Soins**, **Témoignages**,
+  **Galerie & FAQ**, **Vidéos** (upload de fichier **ou** lien YouTube), **Contact**.
+- Chaque **Enregistrer** publie immédiatement en ligne (écriture dans Supabase).
+  Pas besoin de toucher à Git ni au tableau de bord Supabase.
+
+### Intégrer une vidéo
+Dans **Galerie & FAQ**, pour un emplacement : soit **téléverser un fichier vidéo**
+(stocké dans Supabase Storage), soit coller un **lien YouTube**. Les deux s'affichent
+en responsive sur le site.
+
+## 4. Formulaire de contact (optionnel)
+
+Le site privilégie les boutons Téléphone / SMS / WhatsApp. Si un formulaire est ajouté,
+il utilise **Formspree** : créez un formulaire sur https://formspree.io et renseignez
+l'identifiant dans l'admin (champ `formspree_id`). Aucun serveur d'email requis.
+
+## 5. Développement local (facultatif)
+
+Le dépôt contient encore `server.js` (Express) : c'est **un reliquat** de l'ancienne
+architecture VPS, utile seulement pour un aperçu local. En production Vercel il n'est pas
+utilisé. Pour un simple aperçu statique : servez le dossier avec n'importe quel serveur
+statique (ex. `npx serve .`). L'admin nécessite un accès réseau à Supabase.
+
+## Récapitulatif des fichiers clés
+
+| Fichier              | Rôle                                                        |
+|----------------------|-------------------------------------------------------------|
+| `index.html`         | Page publique                                               |
+| `emma.html`          | Espace admin (Supabase Auth + édition + upload)             |
+| `script.js`          | Interactions + lecture de la config depuis Supabase         |
+| `config.js`          | Config **par défaut** (repli hors-ligne)                    |
+| `supabase-config.js` | URL + clé publique Supabase                                 |
+| `vercel.json`        | Config déploiement (URLs propres, en-têtes, cache)          |
+| `.vercelignore`      | Exclut les fichiers serveur/dev du déploiement statique     |
